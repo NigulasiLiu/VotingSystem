@@ -1,30 +1,20 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+  <a-layout>
+    <navbar />
+    <a-layout-content :style="{padding: '50px',background: '#fff'}">
+      <router-view />
+    </a-layout-content>
+  </a-layout>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
+import Navbar from './views/layouts/Navbar.vue';
 
-nav {
-  padding: 30px;
+export default {
+  components: { Navbar },
+  data() {
+  },
+};
+</script>
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-}
-</style>
+<style lang="scss"></style>
