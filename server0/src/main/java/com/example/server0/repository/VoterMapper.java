@@ -1,4 +1,4 @@
 package com.example.server0.repository;
 
-public class VoterRepository {
+public class VoterMapper {
 }
