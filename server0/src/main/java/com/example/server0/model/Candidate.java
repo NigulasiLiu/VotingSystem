@@ -1,8 +1,5 @@
 package com.example.server0.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
-
 import java.sql.Timestamp;
 
 public class Candidate {
