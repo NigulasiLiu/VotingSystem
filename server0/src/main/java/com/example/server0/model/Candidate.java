@@ -1,6 +1,6 @@
 package com.example.server0.model;
 
-import java.sql.Timestamp;
+
 
 public class Candidate {
 private Integer CandidateId;
