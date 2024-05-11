@@ -1,6 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace一般定义为 包名+文件名 -->
+<mapper namespace="com.example.server0.repository.CandidateMapper">
+    <resultMap id="CandidateMap" type="com.example.server0.model.Candidate">
+        <id column="CandidateId" jdbcType="INTEGER" property="CandidateId" javaType="java.lang.Integer"/>
+        <result column="CandidateName" jdbcType="VARCHAR" property="CandidateName" javaType="java.lang.String"/>
+        <result column="CandidateDetails" jdbcType="VARCHAR" property="pCandidateDetails" javaType="java.lang.String"/>
+        <result column="CndidatePhoto" jdbcType="BLOB" property="CndidatePhoto" javaType="java.sql.Blob"/>
+    </resultMap>
 
-</beans>
+
+
+    <select id="selectByCandidate" resultMap="CandidateMap">
+        select CandidateId,CandidateName
+        from votingsystem.candidate
+        where CandidateId=#{candidate.CandidateId} and CandidateName=#{candidate.CandidateName}
+    </select>
+
+    <!--
+   数据库返回数据会有三种标准形态
+   1. 没有找到匹配数据，返回空的内容
+   2. 找到一条数据，返回单行内容
+   3. 找到多条数据，返回多行内容
+   -->
+
+
+
+
+
+    <select id="selectCount" resultType="java.lang.Integer">
+        select
+        count(CandidateId)
+        from
+        votingsystem.candidate
+        <where>
+            <if test="CandidateName != null and CandidateName != ''">
+                CandidateName like "%"#{CandidateName}"%"
+            </if>
+
+        </where>
+    </select>
+
+
+    <select id="selectByPage" resultMap="CandidateMap">
+        select
+        CandidateId,CandidateName,CandidateDetails,CndidatePhoto
+        from
+        votingsystem.candidate
+        <where>
+            <if test="CandidateName != null and CandidateName != ''">
+                CandidateName like "%"#{CandidateName}"%"
+            </if>
+
+        </where>
+        limit
+        #{index},#{limit}
+    </select>
+
+
+    <insert id="insert">
+        insert into votingsystem.candidate(CandidateId, CandidateName, CandidateDetails,CndidatePhoto) values(#{candidate.CandidateId}, #{candidate.CandidateName}, #{candidate.CandidateDetails},#{candidate.CndidatePhoto})
+    </insert>
+
+
+
+    <delete id="deleteById">
+        delete from votingsystem.candidate where CandidateId=#{id}
+    </delete>
+
+    <update id="updateDetails">
+        update votingsystem.candidate set CandidateDetails=#{details} where CandidateId=#{id}
+    </update>
+
+
+</mapper>

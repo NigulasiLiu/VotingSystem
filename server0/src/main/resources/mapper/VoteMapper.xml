@@ -1,6 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace一般定义为 包名+文件名 -->
+<mapper namespace="com.example.server0.mapper.VoteMapper">
+    <resultMap id="VoteMap" type="com.example.server0.model.Vote">
+        <id column="VoteId" jdbcType="INTEGER" property="VoteId" javaType="java.lang.Integer"/>
+        <result column="VoteName" jdbcType="VARCHAR" property="VoteName" javaType="java.lang.String"/>
+        <result column="VoteRusult" jdbcType="VARCHAR" property="VoteRusult" javaType="java.lang.String"/>
+        <result column="VoteType" jdbcType="VARCHAR" property="VoteType" javaType="java.lang.String"/>
+        <result column="VoteDdl" jdbcType="DATE" property="VoteDdl" javaType="java.sql.Timestamp"/>
+    </resultMap>
 
-</beans>
+    <!-- id是自定义的名称，通常使用的通俗的命名办法，比如selectById代表基于主键id值，查询一条唯一的记录  -->
+    <!-- #{id} 代表预处理任务，反之SQL注入攻击  这里需要取到一个传递过来的id值(动态处理) -->
+    <select id="selectByVote" resultMap="VoteMap">
+        select VoteId, VoteName, VoteResult,VoteType
+        from votingsystem.vote
+        where VoteId=#{vote.VoteId} and VoteName=#{vote.VoteName} and VoteResult=#{vote.VoteResult} and VoteType=#{vote.VoteType}
+    </select>
+
+    <!-- 查询数据库中总共有多少条记录 -->
+    <select id="selectVoteCount" resultType="java.lang.Integer">
+        select
+        count(VoteId)
+        from
+        votingsystem.vote
+        <where>
+            <if test="VoteName != null and VoteName != ''">
+                VoteName like "%"#{VoteName}"%"
+            </if>
+            <if test="VoteResult != null and VoteResult != ''">
+                and VoteResult like "%"#{VoteResult}"%"
+            </if>
+            <if test="VoteType != null and VoteType != ''">
+                and VoteType like "%"#{VoteType}"%"
+            </if>
+        </where>
+    </select>
+
+    <!-- 基于下标和分页值，进行分页查询 -->
+    <!--             where-->
+    <!--                 username like '%'#{username}'%' and age=#{age}-->
+    <select id="selectByVotePage" resultMap="VoteMap">
+        select
+        VoteId, VoteName, VoteResult, VoteType, VoteDdl
+        from
+        votingsystem.voter
+        <where>
+            <if test="VoteName != null and VoteName != ''">
+                VoteName like "%"#{VoteName}"%"
+            </if>
+            <if test="VoteResult != null and VoteResult != ''">
+                and VoteResult like "%"#{VoteResult}"%"
+            </if>
+            <if test="VoteType != null and VoteType != ''">
+                and VoteType like "%"#{VoteType}"%"
+            </if>
+        </where>
+        limit
+        #{index},#{limit}
+    </select>
+
+    <!--
+    数据库返回数据会有三种标准形态
+    1. 没有找到匹配数据，返回空的内容
+    2. 找到一条数据，返回单行内容
+    3. 找到多条数据，返回多行内容
+    -->
+    <!--    <insert id="insert">-->
+    <!--    <update id=""></update>-->
+    <!--    <delete id=""></delete>-->
+    <!--
+    select id, username, password from dzkd2023.user where username='dk001' and password='qweqwewqewqeewq' or 1=1 or username=admin limit 1
+
+    -->
+    <insert id="insertVote">
+        insert into votingsystem.vote(VoteName, VoteResult, VoteType, VoteDdl) values(#{vote.VoterName}, #{vote.VoteResult}, #{vote.VoteType}, #{vote.VoteDdl}
+    </insert>
+
+    <delete id="deleteByVoteId">
+        delete from votingsystem.vote where VoteId=#{VoteId}
+    </delete>
+
+    <update id="updateVoteTypeAndVoteDdlAndVoteResult">
+        update votingsystem.vote set VoteType=#{VoterType}, VoteDdl=#{VoteDdl}, VoteResult=#{VoteResult} where VoteId=#{VoteId};
+    </update>
+</mapper>
