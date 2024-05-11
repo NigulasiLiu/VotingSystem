@@ -1,35 +1,41 @@
 <template>
-    <a-row class="mt-5">
-        <a-col md="8" offset-md="2" lg="6" offset-lg="3">
-            <a-card title="注册" style="text-align: center;">
-                <a-form :model="user" name="basic" :rules="rules" :label-col="{ span: 7 }" :wrapper-col="{ span: 17 }"
-                    autocomplete="off" @finish="onFinish" @finishFailed="onFinishFailed">
-                    <a-form-item label="手机号" name="tel">
-                        <a-input v-model:value="user.tel" />
-                    </a-form-item>
+  <a-row class="mt-5">
+    <a-col md="8" offset-md="2" lg="6" offset-lg="3">
+      <a-card title="注册" style="text-align: center;">
+        <a-form :model="user" name="basic" :rules="rules" :label-col="{ span: 7 }" :wrapper-col="{ span: 17 }"
+          autocomplete="off" @finish="onFinish" @finishFailed="onFinishFailed">
+          <a-form-item label="手机号" name="Telephone">
+            <a-input v-model:value="user.Telephone" />
+          </a-form-item>
 
-                    <a-form-item label="密码" name="pass">
-                        <a-input-password v-model:value="user.pass" />
-                    </a-form-item>
+          <a-form-item label="密码" name="Password">
+            <a-input-password v-model:value="user.Password" />
+          </a-form-item>
 
-                    <a-form-item label="确认密码" name="checkPass">
-                        <a-input-password v-model:value="user.checkPass" />
-                    </a-form-item>
+          <a-form-item label="确认密码" name="checkPass">
+            <a-input-password v-model:value="user.checkPass" />
+          </a-form-item>
 
-                    <a-form-item :wrapper-col="{span: 24 }">
-                        <a-button type="primary" html-type="submit" style="width: 40%">注&emsp;册</a-button>
-                    </a-form-item>
-                </a-form>
-            </a-card>
-        </a-col>
-    </a-row>
+          <a-form-item :wrapper-col="{span: 24 }">
+            <a-button type="primary" html-type="submit" style="width: 40%">注&emsp;册</a-button>
+          </a-form-item>
+        </a-form>
+      </a-card>
+    </a-col>
+  </a-row>
 </template>
-<script>
-import { defineComponent, reactive } from 'vue';
+<script setup>
+import { reactive } from 'vue';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+import { message } from 'ant-design-vue';
+
+const router = useRouter();
+const store = useStore();
 
 const user = reactive({
-  tel: '',
-  pass: '',
+  Telephone: '',
+  Password: '',
   checkPass: '',
 });
 
@@ -63,19 +69,19 @@ const validatePass2 = async (_rule, value) => {
   if (value.length < 6 || value.length > 30) {
     return Promise.reject(new Error('密码应为6到30位'));
   }
-  if (value !== user.pass) {
+  if (value !== user.Password) {
     return Promise.reject(new Error('两次输入不一致'));
   }
   return Promise.resolve();
 };
 
 const rules = {
-  tel: {
+  Telephone: {
     required: true,
     validator: validateTel,
     trigger: 'blur',
   },
-  pass: {
+  Password: {
     required: true,
     validator: validatePass,
     trigger: 'blur',
@@ -88,22 +94,16 @@ const rules = {
 
 };
 
-export default defineComponent({
+const onFinish = (values) => {
+  store.dispatch('userModule/register', { telephone: values.Telephone, password: values.Password }).then(() => {
+    message.success('注册成功');
+    router.push({ path: '/' });
+  }).catch((err) => {
+    message.error(err.response.data.msg);
+  });
+};
 
-  setup() {
-    const handleFinish = (values) => {
-      console.log(values);
-    };
-    const handleFinishFailed = (errors) => {
-      console.log(errors);
-    };
-
-    return {
-      user,
-      rules,
-      handleFinish,
-      handleFinishFailed,
-    };
-  },
-});
+const onFinishFailed = (errors) => {
+  console.log(errors);
+};
 </script>
