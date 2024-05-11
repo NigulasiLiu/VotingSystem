@@ -3,36 +3,36 @@
 <!-- namespace一般定义为 包名+文件名 -->
 <mapper namespace="com.example.server0.mapper.VoteMapper">
     <resultMap id="VoteMap" type="com.example.server0.model.Vote">
-        <id column="VoteId" jdbcType="INTEGER" property="VoteId" javaType="java.lang.Integer"/>
-        <result column="VoteName" jdbcType="VARCHAR" property="VoteName" javaType="java.lang.String"/>
-        <result column="VoteRusult" jdbcType="VARCHAR" property="VoteRusult" javaType="java.lang.String"/>
-        <result column="VoteType" jdbcType="VARCHAR" property="VoteType" javaType="java.lang.String"/>
-        <result column="VoteDdl" jdbcType="DATE" property="VoteDdl" javaType="java.sql.Timestamp"/>
+        <id column="voteId" jdbcType="INTEGER" property="voteId" javaType="java.lang.Integer"/>
+        <result column="voteName" jdbcType="VARCHAR" property="voteName" javaType="java.lang.String"/>
+        <result column="voteResult" jdbcType="VARCHAR" property="voteResult" javaType="java.lang.String"/>
+        <result column="voteType" jdbcType="VARCHAR" property="voteType" javaType="java.lang.String"/>
+        <result column="voteDdl" jdbcType="DATE" property="voteDdl" javaType="java.sql.Timestamp"/>
     </resultMap>
 
     <!-- id是自定义的名称，通常使用的通俗的命名办法，比如selectById代表基于主键id值，查询一条唯一的记录  -->
     <!-- #{id} 代表预处理任务，反之SQL注入攻击  这里需要取到一个传递过来的id值(动态处理) -->
     <select id="selectByVote" resultMap="VoteMap">
-        select VoteId, VoteName, VoteResult,VoteType
+        select voteId, voteName, voteResult,voteType
         from votingsystem.vote
-        where VoteId=#{vote.VoteId} and VoteName=#{vote.VoteName} and VoteResult=#{vote.VoteResult} and VoteType=#{vote.VoteType}
+        where voteId=#{vote.voteId} and voteName=#{vote.voteName} and voteResult=#{vote.voteResult} and voteType=#{vote.voteType}
     </select>
 
     <!-- 查询数据库中总共有多少条记录 -->
     <select id="selectVoteCount" resultType="java.lang.Integer">
         select
-        count(VoteId)
+        count(voteId)
         from
         votingsystem.vote
         <where>
-            <if test="VoteName != null and VoteName != ''">
-                VoteName like "%"#{VoteName}"%"
+            <if test="voteName != null and voteName != ''">
+                voteName like "%"#{voteName}"%"
             </if>
-            <if test="VoteResult != null and VoteResult != ''">
-                and VoteResult like "%"#{VoteResult}"%"
+            <if test="voteResult != null and voteResult != ''">
+                and voteResult like "%"#{voteResult}"%"
             </if>
-            <if test="VoteType != null and VoteType != ''">
-                and VoteType like "%"#{VoteType}"%"
+            <if test="voteType != null and voteType != ''">
+                and voteType like "%"#{voteType}"%"
             </if>
         </where>
     </select>
@@ -42,18 +42,18 @@
     <!--                 username like '%'#{username}'%' and age=#{age}-->
     <select id="selectByVotePage" resultMap="VoteMap">
         select
-        VoteId, VoteName, VoteResult, VoteType, VoteDdl
+        voteId, voteName, voteResult, voteType, voteDdl
         from
         votingsystem.voter
         <where>
-            <if test="VoteName != null and VoteName != ''">
-                VoteName like "%"#{VoteName}"%"
+            <if test="voteName != null and voteName != ''">
+                voteName like "%"#{voteName}"%"
             </if>
-            <if test="VoteResult != null and VoteResult != ''">
-                and VoteResult like "%"#{VoteResult}"%"
+            <if test="voteResult != null and voteResult != ''">
+                and voteResult like "%"#{voteResult}"%"
             </if>
-            <if test="VoteType != null and VoteType != ''">
-                and VoteType like "%"#{VoteType}"%"
+            <if test="voteType != null and voteType != ''">
+                and voteType like "%"#{voteType}"%"
             </if>
         </where>
         limit
@@ -74,14 +74,14 @@
 
     -->
     <insert id="insertVote">
-        insert into votingsystem.vote(VoteName, VoteResult, VoteType, VoteDdl) values(#{vote.VoterName}, #{vote.VoteResult}, #{vote.VoteType}, #{vote.VoteDdl}
+        insert into votingsystem.vote(voteName, voteResult, voteType, voteDdl) values(#{vote.voterName}, #{vote.voteResult}, #{vote.voteType}, #{vote.voteDdl}
     </insert>
 
     <delete id="deleteByVoteId">
-        delete from votingsystem.vote where VoteId=#{VoteId}
+        delete from votingsystem.vote where voteId=#{voteId}
     </delete>
 
     <update id="updateVoteTypeAndVoteDdlAndVoteResult">
-        update votingsystem.vote set VoteType=#{VoterType}, VoteDdl=#{VoteDdl}, VoteResult=#{VoteResult} where VoteId=#{VoteId};
+        update votingsystem.vote set voteType=#{voterType}, voteDdl=#{voteDdl}, voteResult=#{voteResult} where voteId=#{voteId};
     </update>
 </mapper>

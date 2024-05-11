@@ -3,38 +3,38 @@
 <!-- namespace一般定义为 包名+文件名 -->
 <mapper namespace="com.example.server0.mapper.VoterMapper">
     <resultMap id="VoterMap" type="com.example.server0.model.Voter">
-        <id column="VoterId" jdbcType="INTEGER" property="VoterId" javaType="java.lang.Integer"/>
-        <result column="VoterName" jdbcType="VARCHAR" property="VoterName" javaType="java.lang.String"/>
+        <id column="voterId" jdbcType="INTEGER" property="voterId" javaType="java.lang.Integer"/>
+        <result column="voterName" jdbcType="VARCHAR" property="voterName" javaType="java.lang.String"/>
         <result column="password" jdbcType="VARCHAR" property="password" javaType="java.lang.String"/>
-        <result column="VoterType" jdbcType="VARCHAR" property="VoterType" javaType="java.lang.String"/>
+        <result column="voterType" jdbcType="VARCHAR" property="voterType" javaType="java.lang.String"/>
     </resultMap>
 
     <!-- id是自定义的名称，通常使用的通俗的命名办法，比如selectById代表基于主键id值，查询一条唯一的记录  -->
     <!-- #{id} 代表预处理任务，反之SQL注入攻击  这里需要取到一个传递过来的id值(动态处理) -->
     <select id="selectByVoter" resultMap="VoterMap">
-        select VoterId, VoterName, password,VoterType
+        select voterId, voterName, password,voterType
         from votingsystem.voter
-        where VoterId=#{voter.VoterId} and VoterName=#{voter.VoterName} and password=#{voter.password} and VoterType=#{voter.VoterType}
+        where voterId=#{voter.voterId} and voterName=#{voter.voterName} and password=#{voter.password} and VoterType=#{voter.voterType}
     </select>
 
     <select id="login" resultMap="VoterMap">
-        select VoterId, VoterName, password,VoterType
+        select voterId, voterName, password,voterType
         from votingsystem.voter
-        where VoterName=#{voter.VoterName} and password=#{voter.password}
+        where voterName=#{voter.voterName} and password=#{voter.password}
     </select>
 
     <!-- 查询数据库中总共有多少条记录 -->
     <select id="selectVoterCount" resultType="java.lang.Integer">
         select
-        count(VoterId)
+        count(voterId)
         from
         votingsystem.voter
         <where>
-            <if test="VoterName != null and VoterName != ''">
-                VoterName like "%"#{VoterName}"%"
+            <if test="voterName != null and voterName != ''">
+                voterName like "%"#{voterName}"%"
             </if>
-            <if test="VoterType != null and VoterType != ''">
-                and VoterType like "%"#{VoterType}"%"
+            <if test="voterType != null and voterType != ''">
+                and voterType like "%"#{voterType}"%"
             </if>
         </where>
     </select>
@@ -44,15 +44,15 @@
     <!--                 username like '%'#{username}'%' and age=#{age}-->
     <select id="selectByVoterPage" resultMap="VoterMap">
         select
-        VoterId, VoterName, password, VoterType
+        voterId, voterName, password, voterType
         from
         votingsystem.voter
         <where>
-            <if test="VoterName != null and VoterName != ''">
-                VoterName like "%"#{VoterName}"%"
+            <if test="voterName != null and voterName != ''">
+                voterName like "%"#{voterName}"%"
             </if>
-            <if test="VoterType != null and VoterType != ''">
-                and VoterType like "%"#{VoterType}"%"
+            <if test="voterType != null and voterType != ''">
+                and voterType like "%"#{voterType}"%"
             </if>
         </where>
         limit
@@ -73,14 +73,14 @@
 
     -->
     <insert id="insertVoter">
-        insert into votingsystem.voter(VoterName, password, VoterType) values(#{voter.VoterName}, #{voter.password}, #{voter.VoterType})
+        insert into votingsystem.voter(voterName, password, voterType) values(#{voter.voterName}, #{voter.password}, #{voter.voterType})
     </insert>
 
     <delete id="deleteByVoterId">
-        delete from votingsystem.voter where VoterId=#{VoterId}
+        delete from votingsystem.voter where voterId=#{voterId}
     </delete>
 
     <update id="updateVoterType">
-        update votingsystem.voter set VoterType=#{VoterType} where VoterId=#{VoterId};
+        update votingsystem.voter set voterType=#{voterType} where voterId=#{voterId};
     </update>
 </mapper>

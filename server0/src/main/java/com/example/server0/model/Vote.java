@@ -4,49 +4,49 @@ import java.sql.Date;
 import java.sql.Timestamp;
 
 public class Vote {
-    private Integer VoteId;
-    private String VoteName;
-    private String VoteResult;
-    private String VoteType;
-    private Date VoteDdl;
+    private Integer voteId;
+    private String voteName;
+    private String voteResult;
+    private String voteType;
+    private Date voteDdl;
 
     public Integer getVoteId() {
-        return VoteId;
+        return voteId;
     }
 
     public void setVoteId(Integer voteId) {
-        VoteId = voteId;
+        this.voteId = voteId;
     }
 
     public String getVoteName() {
-        return VoteName;
+        return voteName;
     }
 
     public void setVoteName(String voteName) {
-        VoteName = voteName;
+        this.voteName = voteName;
     }
 
     public String getVoteResult() {
-        return VoteResult;
+        return voteResult;
     }
 
     public void setVoteResult(String voteResult) {
-        VoteResult = voteResult;
+        this.voteResult = voteResult;
     }
 
     public String getVoteType() {
-        return VoteType;
+        return voteType;
     }
 
     public void setVoteType(String voteType) {
-        VoteType = voteType;
+        this.voteType = voteType;
     }
 
     public Date getVoteDdl() {
-        return VoteDdl;
+        return voteDdl;
     }
 
     public void setVoteDdl(Date voteDdl) {
-        VoteDdl = voteDdl;
+        this.voteDdl = voteDdl;
     }
 }

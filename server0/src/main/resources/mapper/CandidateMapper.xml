@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!-- namespace一般定义为 包名+文件名 -->
-<mapper namespace="com.example.server0.repository.CandidateMapper">
+<mapper namespace="com.example.server0.mapper.CandidateMapper">
     <resultMap id="CandidateMap" type="com.example.server0.model.Candidate">
-        <id column="CandidateId" jdbcType="INTEGER" property="CandidateId" javaType="java.lang.Integer"/>
-        <result column="CandidateName" jdbcType="VARCHAR" property="CandidateName" javaType="java.lang.String"/>
-        <result column="CandidateDetails" jdbcType="VARCHAR" property="pCandidateDetails" javaType="java.lang.String"/>
-        <result column="CndidatePhoto" jdbcType="BLOB" property="CndidatePhoto" javaType="java.sql.Blob"/>
+        <id column="candidateId" jdbcType="INTEGER" property="candidateId" javaType="java.lang.Integer"/>
+        <result column="candidateName" jdbcType="VARCHAR" property="candidateName" javaType="java.lang.String"/>
+        <result column="candidateDetails" jdbcType="VARCHAR" property="candidateDetails" javaType="java.lang.String"/>
+        <result column="candidatePhoto" jdbcType="BLOB" property="candidatePhoto" javaType="java.sql.Blob"/>
     </resultMap>
 
 
 
     <select id="selectByCandidate" resultMap="CandidateMap">
-        select CandidateId,CandidateName
+        select candidateId,candidateName
         from votingsystem.candidate
-        where CandidateId=#{candidate.CandidateId} and CandidateName=#{candidate.CandidateName}
+        where candidateId=#{candidate.candidateId} and candidateName=#{candidate.candidateName}
     </select>
 
     <!--
@@ -30,12 +31,12 @@
 
     <select id="selectCount" resultType="java.lang.Integer">
         select
-        count(CandidateId)
+        count(candidateId)
         from
         votingsystem.candidate
         <where>
-            <if test="CandidateName != null and CandidateName != ''">
-                CandidateName like "%"#{CandidateName}"%"
+            <if test="candidateName != null and candidateName != ''">
+                candidateName like "%"#{candidateName}"%"
             </if>
 
         </where>
@@ -44,12 +45,12 @@
 
     <select id="selectByPage" resultMap="CandidateMap">
         select
-        CandidateId,CandidateName,CandidateDetails,CndidatePhoto
+        candidateId,candidateName,candidateDetails,cndidatePhoto
         from
         votingsystem.candidate
         <where>
-            <if test="CandidateName != null and CandidateName != ''">
-                CandidateName like "%"#{CandidateName}"%"
+            <if test="candidateName != null and candidateName != ''">
+                candidateName like "%"#{candidateName}"%"
             </if>
 
         </where>
@@ -59,17 +60,17 @@
 
 
     <insert id="insert">
-        insert into votingsystem.candidate(CandidateId, CandidateName, CandidateDetails,CndidatePhoto) values(#{candidate.CandidateId}, #{candidate.CandidateName}, #{candidate.CandidateDetails},#{candidate.CndidatePhoto})
+        insert into votingsystem.candidate(candidateId, candidateName, candidateDetails,candidatePhoto) values(#{candidate.candidateId}, #{candidate.candidateName}, #{candidate.candidateDetails},#{candidate.candidatePhoto})
     </insert>
 
 
 
     <delete id="deleteById">
-        delete from votingsystem.candidate where CandidateId=#{id}
+        delete from votingsystem.candidate where candidateId=#{candidateId}
     </delete>
 
     <update id="updateDetails">
-        update votingsystem.candidate set CandidateDetails=#{details} where CandidateId=#{id}
+        update votingsystem.candidate set candidateDetails=#{candidateDetails} where candidateId=#{candidateId}
     </update>
 
 

@@ -3,41 +3,41 @@ package com.example.server0.model;
 
 
 public class Candidate {
-private Integer CandidateId;
-private String CandidateName;
-private String CandidateDetails;
-private byte[] CandidatePhoto;
+private Integer candidateId;
+private String candidateName;
+private String candidateDetails;
+private byte[] candidatePhoto;
 
     public Integer getCandidateId() {
-        return CandidateId;
+        return candidateId;
     }
 
     public void setCandidateId(Integer candidateId) {
-        CandidateId = candidateId;
+        this.candidateId = candidateId;
     }
 
     public String getCandidateName() {
-        return CandidateName;
+        return candidateName;
     }
 
     public void setCandidateName(String candidateName) {
-        CandidateName = candidateName;
+        this.candidateName = candidateName;
     }
 
     public String getCandidateDetails() {
-        return CandidateDetails;
+        return candidateDetails;
     }
 
     public void setCandidateDetails(String candidateDetails) {
-        CandidateDetails = candidateDetails;
+        this.candidateDetails = candidateDetails;
     }
 
     public byte[] getCandidatePhoto() {
-        return CandidatePhoto;
+        return candidatePhoto;
     }
 
     public void setCandidatePhoto(byte[] candidatePhoto) {
-        CandidatePhoto = candidatePhoto;
+        this.candidatePhoto = candidatePhoto;
     }
 }
 
