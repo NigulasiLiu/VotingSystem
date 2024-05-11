@@ -14,10 +14,8 @@
   </a-layout-header>
 </template>
 <script setup>
-import { ref } from 'vue';
 import { InfoCircleOutlined, HomeOutlined } from '@ant-design/icons-vue';
 
-const current = ref(['home']);
 </script>
 <style scoped>
 .logo {
