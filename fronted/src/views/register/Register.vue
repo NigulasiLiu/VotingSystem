@@ -1,28 +1,26 @@
 <template>
-  <a-row class="mt-5">
-    <a-col md="8" offset-md="2" lg="6" offset-lg="3">
-      <a-card title="注册" style="text-align: center;">
-        <a-form :model="user" name="basic" :rules="rules" :label-col="{ span: 7 }" :wrapper-col="{ span: 17 }"
-          autocomplete="off" @finish="onFinish" @finishFailed="onFinishFailed">
-          <a-form-item label="手机号" name="Telephone">
-            <a-input v-model:value="user.Telephone" />
-          </a-form-item>
+  <div class="container">
+    <a-card title="注册" style="text-align: center;width:25rem">
+      <a-form :model="user" name="basic" :rules="rules" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }"
+        autocomplete="off" @finish="onFinish" @finishFailed="onFinishFailed">
+        <a-form-item label="手机号" name="Telephone">
+          <a-input v-model:value="user.Telephone" />
+        </a-form-item>
 
-          <a-form-item label="密码" name="Password">
-            <a-input-password v-model:value="user.Password" />
-          </a-form-item>
+        <a-form-item label="密码" name="Password">
+          <a-input-password v-model:value="user.Password" />
+        </a-form-item>
 
-          <a-form-item label="确认密码" name="checkPass">
-            <a-input-password v-model:value="user.checkPass" />
-          </a-form-item>
+        <a-form-item label="确认密码" name="checkPass">
+          <a-input-password v-model:value="user.checkPass" />
+        </a-form-item>
 
-          <a-form-item :wrapper-col="{span: 24 }">
-            <a-button type="primary" html-type="submit" style="width: 40%">注&emsp;册</a-button>
-          </a-form-item>
-        </a-form>
-      </a-card>
-    </a-col>
-  </a-row>
+        <a-form-item :wrapper-col="{span: 24 }">
+          <a-button type="primary" html-type="submit" style="width: 40%">注&emsp;册</a-button>
+        </a-form-item>
+      </a-form>
+    </a-card>
+  </div>
 </template>
 <script setup>
 import { reactive } from 'vue';
@@ -107,3 +105,15 @@ const onFinishFailed = (errors) => {
   console.log(errors);
 };
 </script>
+<style scoped>
+.container {
+  text-align: -webkit-center;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+}
+</style>
