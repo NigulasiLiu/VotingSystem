@@ -18,25 +18,6 @@
         where voteId=#{vote.voteId} and voteName=#{vote.voteName} and voteResult=#{vote.voteResult} and voteType=#{vote.voteType}
     </select>
 
-    <!-- 查询数据库中总共有多少条记录 -->
-    <select id="selectVoteCount" resultType="java.lang.Integer">
-        select
-        count(voteId)
-        from
-        votingsystem.vote
-        <where>
-            <if test="voteName != null and voteName != ''">
-                voteName like "%"#{voteName}"%"
-            </if>
-            <if test="voteResult != null and voteResult != ''">
-                and voteResult like "%"#{voteResult}"%"
-            </if>
-            <if test="voteType != null and voteType != ''">
-                and voteType like "%"#{voteType}"%"
-            </if>
-        </where>
-    </select>
-
     <!-- 基于下标和分页值，进行分页查询 -->
     <!--             where-->
     <!--                 username like '%'#{username}'%' and age=#{age}-->

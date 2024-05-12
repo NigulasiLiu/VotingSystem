@@ -26,23 +26,6 @@
    -->
 
 
-
-
-
-    <select id="selectCount" resultType="java.lang.Integer">
-        select
-        count(candidateId)
-        from
-        votingsystem.candidate
-        <where>
-            <if test="candidateName != null and candidateName != ''">
-                candidateName like "%"#{candidateName}"%"
-            </if>
-
-        </where>
-    </select>
-
-
     <select id="selectByPage" resultMap="CandidateMap">
         select
         candidateId,candidateName,candidateDetails,cndidatePhoto

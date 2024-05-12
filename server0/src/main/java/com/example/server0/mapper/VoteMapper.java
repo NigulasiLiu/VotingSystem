@@ -14,11 +14,6 @@ public interface VoteMapper {
                                 @Param("voteResult") String voteResult,
                                 @Param("voteType") String voteType);
 
-
-    int selectVoteCount(@Param("voteName") String voteName,
-                        @Param("voteType") String voteType,
-                        @Param("voteResult") String voteResult);
-
     void insertVote(@Param("vote") Vote vote);
 
     void deleteByVoteId(Integer voteId);
