@@ -2,6 +2,8 @@ package com.example.server0.model;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Vote {
     private Integer voteId;
@@ -49,4 +51,6 @@ public class Vote {
     public void setVoteDdl(Date voteDdl) {
         this.voteDdl = voteDdl;
     }
+
+
 }

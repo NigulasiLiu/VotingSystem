@@ -29,17 +29,26 @@ public class VoterService {
 
         Voter loginVoter = voterMapper.login(voter);
         Map<String, Object> map = new HashMap<>();   // 初始化一个返回数据对象
-        if(loginVoter == null) {   // 代表用户名不存在
+        if (loginVoter == null) {   // 代表用户名不存在
             map.put("code", 422);
             map.put("msg", "用户不存在");
-        }
-        else {                    // 代表用户登录成功 用户名和密码正确
-            map.put("code", 200);
-            map.put("msg", "登录成功");
-            map.put("voter", loginVoter);
+        } else {
+            if (!loginVoter.getPassword().equals(passwordMD5)) { // 密码不正确
+                map.put("code", 422);
+                map.put("msg", "密码错误");
+            }
+            else { // 用户名和密码正确
+                // 生成token，这里假设您有一个名为TokenUtils的工具类来生成token
+                String token = TokenService.generateToken(loginVoter.getVoterName());
+                map.put("code", 200);
+                map.put("msg", "登录成功");
+                map.put("token", token);
+                map.put("user", loginVoter);
+            }
         }
         return map;
     }
+
 
     public Map<String, Object> register(Voter voter) {
         String password = voter.getPassword();
