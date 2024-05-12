@@ -1,18 +1,3 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <a-button type="link" @click="$router.replace({name:'votinglist'})">投票列表页</a-button>
 </template>
-
-<script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue';
-
-export default {
-  name: 'HomeView',
-  components: {
-    HelloWorld,
-  },
-};
-</script>

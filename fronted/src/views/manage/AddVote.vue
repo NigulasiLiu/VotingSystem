@@ -88,7 +88,7 @@ const rules = {
 const onFinish = (values) => {
   store.dispatch('voteModule/addvote', values).then(() => {
     message.success('添加成功');
-    router.push({ path: '/' });
+    router.push({ path: '/votinglist' });
   }).catch((err) => {
     message.error(err.response.data.msg);
   });
