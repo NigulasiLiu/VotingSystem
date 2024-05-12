@@ -19,8 +19,14 @@
     </a-card>
   </div>
 </template>
-<script>
-import { defineComponent, reactive } from 'vue';
+<script setup>
+import { reactive } from 'vue';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+import { message } from 'ant-design-vue';
+
+const router = useRouter();
+const store = useStore();
 
 const userlogin = reactive({
   tel: '',
@@ -63,24 +69,18 @@ const loginrules = {
   },
 };
 
-export default defineComponent({
+const onFinish = (values) => {
+  store.dispatch('userModule/login', { telephone: values.tel, password: values.pass }).then(() => {
+    message.success('登录成功');
+    router.push({ path: '/' });
+  }).catch((err) => {
+    message.error(err.response.data.msg);
+  });
+};
 
-  setup() {
-    const handleFinish = (values) => {
-      console.log(values);
-    };
-    const handleFinishFailed = (errors) => {
-      console.log(errors);
-    };
-
-    return {
-      userlogin,
-      loginrules,
-      handleFinish,
-      handleFinishFailed,
-    };
-  },
-});
+const onFinishFailed = (errors) => {
+  console.log(errors);
+};
 </script>
 <style scoped>
 .container {
