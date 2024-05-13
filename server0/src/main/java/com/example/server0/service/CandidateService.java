@@ -3,7 +3,7 @@ package com.example.server0.service;
 
 import com.example.server0.mapper.CandidateMapper;
 import com.example.server0.model.Candidate;
-import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +11,8 @@ import java.util.Map;
 
 @Service
 public class CandidateService {
-    @Resource
+
+    @Autowired
     private CandidateMapper candidateMapper;
     public Candidate selectByCandidate(Candidate candidate) {
         return candidateMapper.selectByCandidate(candidate);

@@ -2,10 +2,11 @@ package com.example.server0.service;
 
 import com.example.server0.mapper.VoterMapper;
 import com.example.server0.model.Voter;
-import jakarta.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
+import javax.annotation.Resource;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.HashMap;

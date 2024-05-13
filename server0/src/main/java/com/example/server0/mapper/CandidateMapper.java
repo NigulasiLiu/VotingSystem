@@ -1,10 +1,11 @@
 package com.example.server0.mapper;
 
 import com.example.server0.model.Candidate;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-
+@Mapper
 public interface CandidateMapper {
 
 

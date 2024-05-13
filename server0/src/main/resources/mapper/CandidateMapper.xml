@@ -7,7 +7,7 @@
         <id column="candidateId" jdbcType="INTEGER" property="candidateId" javaType="java.lang.Integer"/>
         <result column="candidateName" jdbcType="VARCHAR" property="candidateName" javaType="java.lang.String"/>
         <result column="candidateDetails" jdbcType="VARCHAR" property="candidateDetails" javaType="java.lang.String"/>
-        <result column="candidatePhoto" jdbcType="BLOB" property="candidatePhoto" javaType="java.sql.Blob"/>
+        <result column="candidatePhoto" jdbcType="BLOB" property="candidatePhoto" javaType="byte[]"/>
     </resultMap>
 
 
