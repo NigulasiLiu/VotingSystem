@@ -14,5 +14,12 @@
         WHERE vote_Id = #{voteId}
     </select>
 
+    <select id="candidateIdsByVoteId" resultType="int[]" >
+        SELECT ARRAY_AGG(candidate_Id) AS candidateIds
+        FROM votecandidate
+        WHERE vote_Id = #{voteId};
+    </select>
+
+
 
 </mapper>

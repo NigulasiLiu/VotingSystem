@@ -8,4 +8,5 @@ import java.util.Map;
 public interface VoteCandidateMapper {
 
     int countCandidatesByVoteId(@Param("voteId") Integer voteId);
+    int[] candidateIdsByVoteId(@Param("voteId") Integer voteId);
 }

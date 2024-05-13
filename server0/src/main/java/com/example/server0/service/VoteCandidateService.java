@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -19,4 +20,11 @@ public class VoteCandidateService {
         int numCandidates = voteCandidateMapper.countCandidatesByVoteId(voteId);
         return numCandidates;
     }
+    public int[] candidateIdsByVoteId(Integer voteId) {
+        // 调用 Mapper 层的方法查询指定 voteId 对应的所有 candidateId
+        int[] candidateIds = voteCandidateMapper.candidateIdsByVoteId(voteId);
+
+        return candidateIds;
+    }
+
 }
