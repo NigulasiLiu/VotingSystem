@@ -35,6 +35,7 @@ public class TallyingServiceImpl implements TallyingService {
 
         // 遍历每一张选票
         for (VoteVoter votes : votesList) {
+            String votes1=votes.getBinaryString();
             // 从选票对象中获取投票ID
             Integer voteId = votes.getVote_Id();
             // 调用 VoteCandidateService 中的方法计算候选人数量
@@ -45,7 +46,7 @@ public class TallyingServiceImpl implements TallyingService {
             int[] value=voteCandidateService.candidateIdsByVoteId(voteId);
 
             // 调用 EVAL 算法计算选民的 outputs0 和 VW0
-            Eval evalResult = Eval.eval(votes, value);
+            Eval evalResult = Eval.eval(votes1, value);
             double[] outputs0 = evalResult.getOutputs0();
             byte[] VW0 = evalResult.getVW0();
 

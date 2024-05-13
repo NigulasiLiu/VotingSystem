@@ -6,8 +6,18 @@ public class VoteVoter {
     private Integer vote_Id;
     // 候选人ID
     private Integer voter_Id;
+
     // 候选人对象
     private Voter voter; // 添加候选人对象属性
+    private String binaryString;
+
+    public String getBinaryString() {
+        return binaryString;
+    }
+
+    public void setBinaryString(String binaryString) {
+        this.binaryString = binaryString;
+    }
 
     public Integer getVoteVoterId() {
         return voteVoterId;
