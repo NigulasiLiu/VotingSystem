@@ -1,6 +1,11 @@
 <template>
   <div class="container">
-    <a-button v-if="userInfo && userInfo.role===1" type="primary" @click="$router.replace({name:'addvote'})">管理</a-button>
+    <a-space>
+      <a-button v-if="userInfo && userInfo.role===1" type="primary"
+        @click="$router.replace({name:'addvote'})">新增投票</a-button>
+      <a-button v-if="userInfo && userInfo.role===1" type="primary"
+        @click="$router.replace({name:'candidatelist'})">管理候选人</a-button>
+    </a-space>
     <a-divider v-if="userInfo && userInfo.role===1" />
     <a-table :columns="voteData.columns" :data-source="voteData.list">
       <template #bodyCell="{ column, record }">
@@ -31,10 +36,7 @@ export default {
 <style scoped>
 .container {
   margin: 0 auto;
-  /* 让容器水平居中 */
   max-width: 800px;
-  /* 设置最大宽度 */
   padding: 0 20px;
-  /* 左右边距 */
 }
 </style>

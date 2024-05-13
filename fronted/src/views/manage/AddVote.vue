@@ -1,4 +1,3 @@
-import voteService from '@/service/voteService';
 <template>
   <div class="container">
     <a-card title="添加投票" style="text-align:center; width:25rem">
@@ -22,14 +21,13 @@ import voteService from '@/service/voteService';
   </div>
 </template>
 <script setup>
+import voteService from '@/service/voteService';
 import dayjs from 'dayjs';
 import { reactive } from 'vue';
 import { useRouter } from 'vue-router';
-import { useStore } from 'vuex';
 import { message } from 'ant-design-vue';
 
 const router = useRouter();
-const store = useStore();
 
 const vote = reactive({
   name: '',
@@ -86,12 +84,13 @@ const rules = {
 };
 
 const onFinish = (values) => {
-  store.dispatch('voteModule/addvote', values).then(() => {
-    message.success('添加成功');
-    router.push({ path: '/votinglist' });
-  }).catch((err) => {
-    message.error(err.response.data.msg);
-  });
+  voteService.addvote({ name: values.name, num: values.num, deadline: values.deadline })
+    .then(() => {
+      message.success('添加成功');
+      router.push({ path: '/votinglist' });
+    }).catch((err) => {
+      message.error(err.response.data.msg);
+    });
 };
 
 const onFinishFailed = (errors) => {

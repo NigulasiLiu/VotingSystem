@@ -2,7 +2,7 @@
   <div class="container">
     <a-card title="注册" style="text-align: center;width:25rem">
       <a-form :model="user" name="basic" :rules="rules" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }"
-        autocomplete="off" @finish="onFinish" @finishFailed="onFinishFailed">
+        @finish="onFinish" @finishFailed="onFinishFailed">
         <a-form-item label="手机号" name="Telephone">
           <a-input v-model:value="user.Telephone" />
         </a-form-item>

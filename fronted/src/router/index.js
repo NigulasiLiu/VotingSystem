@@ -23,14 +23,29 @@ const routes = [
     component: () => import('../views/manage/AddVote.vue'),
   },
   {
+    path: '/manage/addcandidate',
+    name: 'addcandidate',
+    component: () => import('../views/manage/AddCandidate.vue'),
+  },
+  {
     path: '/votinglist',
     name: 'votinglist',
     component: () => import('../views/vote/List.vue'),
   },
   {
+    path: '/manage/candidatelist',
+    name: 'candidatelist',
+    component: () => import('../views/manage/CandidateList.vue'),
+  },
+  {
     path: '/detail/:id',
     name: 'detail',
     component: () => import('../views/vote/Detail.vue'),
+  },
+  {
+    path: '/candidate/:id',
+    name: 'editcandidate',
+    component: () => import('../views/manage/EditCandidate.vue'),
   },
 ];
 
