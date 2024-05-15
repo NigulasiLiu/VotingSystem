@@ -9,100 +9,168 @@ import java.util.Random;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class Eval {
-    private double[] outputs0;
-    private byte[] VW0;
+import static com.example.server0.service.eval.ConvertG.Convert;
+import static com.example.server0.service.eval.Getbit.getbit;
+import static com.example.server0.service.eval.Hash.hashBit;
+import static com.example.server0.service.eval.HashPrime.hash;
+import static com.example.server0.service.eval.HashPrime.hashPrime;
+import static com.example.server0.service.eval.PG.pg;
 
-    public Eval(double[] outputs0, byte[] VW0) {
+public class Eval {
+    private BigInteger[] outputs0;
+    private String VW0;
+
+    public Eval(BigInteger[] outputs0, String VW0) {
         this.outputs0 = outputs0;
         this.VW0 = VW0;
     }
 
-    public double[] getOutputs0() {
+    public BigInteger[] getOutputs0() {
         return outputs0;
     }
 
-    public byte[] getVW0() {
+    public String getVW0() {
         return VW0;
     }
 
     // Eval 函数
-    public static Eval eval(String votes, int[] value) {
+    public static Eval eval(String votes, int[] value,int lamda) {
+        int eta = value.length;
         // 初始化输出数组、验证参数和值
-        BigInteger[] outputs = new BigInteger[eta];
+        BigInteger[] outputs0 = new BigInteger[eta];
         BigInteger val = BigInteger.ZERO;
         BigInteger pi = BigInteger.ZERO;
+        int n = (int) Math.ceil(Math.log(eta) / Math.log(2));
+        ParseK parse=ParseK.parseVotes(votes,lamda);
+        String s= parse.getS0();
+        String t= parse.getT0();
+        String[] CW=parse.getCWArray();
+        String cs= parse.getCs();
+        String pos= parse.getPos();
+        int posS=pos.charAt(0);
+
 
         // 遍历每个输入值
         for (int omega = 0; omega < eta; omega++) {
             // 获取当前输入值 x
-            BigInteger x = new BigInteger(xValues[omega]);
-
-            // 初始化 s^(0) 和 t^(0)
-            STValues sT = new STValues(BigInteger.ONE, BigInteger.ZERO);
+            BigInteger x = new BigInteger(String.valueOf(value[omega]));
+            String xx = x.toString(2);
 
             // 对于每个修正参数 CW(j)，执行循环
-            for (int j = 0; j < CWs.length - 1; j++) {
+            for (int j = 1; j < n; j++) {
                 // 解析 CW(j)，获取 sCW 和 tCW
-                String[] parts = CWs[j].split("\\|");
-                String sCW = parts[0];
-                String tCW = parts[1];
+                String sCW = CW[j-1].substring(0, lamda);
+                String tCWL = CW[j-1].substring(lamda, lamda+1);
+                String tCWR = CW[j-1].substring(lamda+1, lamda+2);
 
-                // 执行群操作 G，得到 s^(j) 和 t^(j)
-                sT = G(sT, sCW, tCW);
+                //将s扩展为2λ+2位
+                s=pg(s);
+                String sL = s.substring(0, lamda);
+                String tL = s.substring(lamda,lamda+1);
+                String sR = s.substring(lamda+1,lamda+lamda+1);
+                String tR = s.substring(lamda+lamda+1,lamda+lamda+2);
 
-                // 根据 x 的第 j 位判断取 sL/tL 还是 sR/tR
-                BigInteger sL = sT.s;
-                BigInteger tL = sT.t;
-                BigInteger sR, tR; // 获取 sR 和 tR 的值
+                // 将字符串转换为 BigInteger 对象
+                BigInteger sl = new BigInteger(sL, 2);
+                BigInteger tl = new BigInteger(tL, 2);
+                BigInteger scw = new BigInteger(sCW, 2);
+                BigInteger tcwl=new BigInteger(tCWL,2);
+                BigInteger tcwr=new BigInteger(tCWR,2);
+                BigInteger sb=new BigInteger(s,2);
+                BigInteger tb=new BigInteger(t,2);
+                BigInteger sr=new BigInteger(sR,2);
+                BigInteger tr=new BigInteger(tR,2);
 
-                BigInteger s, t;
-                if (x.testBit(j)) {
-                    s = sR.xor(tL.multiply(new BigInteger(sCW)));
-                    t = tR.xor(tL.multiply(new BigInteger(tCW)));
-                } else {
-                    s = sL.xor(tL.multiply(new BigInteger(sCW)));
-                    t = tL.xor(tL.multiply(new BigInteger(tCW)));
+
+
+                if(xx.charAt(j)==0){
+                    // 计算 s = sL 异或 (t 按位与 sCW)
+                     sb= sl.xor(tb.and(scw));
+                     tb=tl.xor(tb.and(tcwl));
                 }
+                else{
 
-                // 更新 s^(j) 和 t^(j)
-                sT = new STValues(s, t);
+                    sb=sr.xor(tb.and(scw));
+                    tb=tr.xor(tb.and(tcwr));
+
+                }
+                s=sb.toString();
+                t=tb.toString();
+            }
+            //现在是得出y
+            String sN=Convert(s);
+            BigInteger sn=new BigInteger(sN,2);
+            BigInteger tn=new BigInteger(t,2);
+            String cwN=CW[CW.length-1];
+            BigInteger cwn=new BigInteger(cwN,2);
+            BigInteger y=sn.add(tn.and(cwn));
+
+            String xn=xx+s;
+            String piPrime=hashBit(xn,n);
+            int m=getbit(s,posS);
+
+            String veR=hashPrime(cs);
+            BigInteger ver=new BigInteger(veR,2);
+
+            if(m==0){
+                String p=hashPrime(piPrime);
+                BigInteger P=new BigInteger(p,2);
+                ver=ver.xor(P);
+            }else{
+                BigInteger pPrime=new BigInteger(piPrime,2);
+                BigInteger cS=new BigInteger(cs,2);
+                BigInteger r=pPrime.xor(cS);
+                String R=r.toString();
+                String q=hashPrime(R);
+                BigInteger Q=new BigInteger(q,2);
+
+                ver=ver.xor(Q);
             }
 
-            // 计算 y = f(x) 产生的输出
-            BigInteger y = Convert(sT.s.add(sT.t.multiply(new BigInteger(CWs[CWs.length - 1]))));
-            y = y.mod(BigInteger.valueOf(2));
 
-            // 计算 π' 和 t
-            byte[] xBytes = x.toByteArray();
-            byte[] sNBytes = sT.s.toByteArray();
-            byte[] piPrimeData = new byte[xBytes.length + sNBytes.length];
-            System.arraycopy(xBytes, 0, piPrimeData, 0, xBytes.length);
-            System.arraycopy(sNBytes, 0, piPrimeData, xBytes.length, sNBytes.length);
+            outputs0[omega]=y;
+            val=val.add(y);
+            pi=pi.xor(ver);
 
-            BigInteger piPrime = H(piPrimeData);
-            int pos = posValues[omega];
-            BigInteger tValue = GB(sT.s, pos);
 
-            // 计算 ver
-            BigInteger ver = cs;
-            if (tValue.equals(BigInteger.ZERO)) {
-                ver = ver.xor(HPrime(piPrime.toByteArray()));
-            } else {
-                ver = ver.xor(HPrime(piPrime.xor(cs).toByteArray()));
-            }
 
-            // 将 y 存入输出数组，并累加到 val 中
-            outputs[omega] = y;
-            val = val.add(y);
+        }
+        String VW0=(pi.toString())+(val.toString());
+        return new Eval(outputs0, VW0);
+    }
 
-            // 更新 π
-            pi = pi.xor(ver);
+    public static String[] parseVotes(String votes, int lambda) {
+        int cwLength = lambda + 2; // 每个 CW 的长度
+        int csLength = 4 * lambda; // cs 的长度
+        int posLength = 1; // pos 的长度
+
+        // 计算 s 和 t 的长度
+        int sLength = lambda;
+        int tLength = 1;
+
+        // 计算 CW 的个数
+        int numCWs = (votes.length() - sLength - tLength - csLength - posLength) / cwLength;
+
+        // 初始化结果数组
+        String[] result = new String[numCWs + 4]; // 加上 s、t、cs 和 pos
+
+        // 解析 s 和 t
+        result[0] = votes.substring(0, sLength); // s
+        result[1] = votes.substring(sLength, sLength + tLength); // t
+
+        // 解析 CWs
+        int start = sLength + tLength;
+        for (int i = 0; i < numCWs; i++) {
+            result[i + 2] = votes.substring(start + i * cwLength, start + (i + 1) * cwLength);
         }
 
-        // 拼接验证参数和 val，得到 VW
-        BigInteger[] VW = Arrays.copyOf(pi.toByteArray(), pi.toByteArray().length + 1);
-        VW[VW.length - 1] = val;
+        // 解析 cs
+        result[numCWs + 2] = votes.substring(votes.length() - csLength - posLength , votes.length() - posLength);
+
+        // 解析 pos
+        result[numCWs + 3] = votes.substring(votes.length() - posLength);
+
+        return result;
     }
-    return new Eval(outputs0, VW0);
+
 }

@@ -6,6 +6,7 @@ public class ConvertG {
 
     // 将二进制字符串转换为整数
     private static int binaryStringToInt(String binaryString) {
+
         return Integer.parseInt(binaryString, 2);
     }
 
