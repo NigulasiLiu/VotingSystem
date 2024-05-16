@@ -14,7 +14,7 @@ public class Getbit {
     }
 
     public static int  getbit(String binaryString,int pos) {
-        int bitValue = getBit(binaryString, pos-1);
+        int bitValue = getBit(binaryString, pos);
         return bitValue;
     }
 }

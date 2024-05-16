@@ -5,9 +5,18 @@ import java.util.List;
 import java.util.Map;
 
 public class TallyResult {
-    private Map<Integer, List<String>> vwTally;
+    private String[] vwTally;
     private Map<Integer,List<BigInteger[]>> outputsTally;
-    public void setVwTally(Map<Integer, List<String>> vwTally) {
+
+    public String[] getVwTally() {
+        return vwTally;
+    }
+
+    public Map<Integer, List<BigInteger[]>> getOutputsTally() {
+        return outputsTally;
+    }
+
+    public void setVwTally(String[] vwTally) {
         this.vwTally = vwTally;
     }
     public void setOutputsTally(Map<Integer,List<BigInteger[]>> outputsTally) {

@@ -36,12 +36,16 @@ public class TallyingServiceImpl implements TallyingService {
         // 从投票控制器中获取投票数组
         //List<VoteVoter> votesList = voteController.getAllVotes();
         List<VoteData> votesList=tallyingController.getList();
+        int nums=votesList.size();
+
         // 创建一个保存计数结果的 Map
         Map<Integer, List<BigInteger[]>> outputsResult = new HashMap<>();
-        Map<Integer, List<String>> vwResult = new HashMap<>();
+        String[] vwResult = new String[nums];
+
 
         // 遍历每一张选票
         for (VoteData votes : votesList) {
+            int i=0;
             String votes1=votes.getK();
             // 从选票对象中获取投票ID
             Integer voteId = votes.getVoteId();
@@ -61,16 +65,17 @@ public class TallyingServiceImpl implements TallyingService {
             // 将 outputs0 和 VW0 添加到对应的列表中
 
             List<BigInteger[]> outputs0List = tallyResultForOutput.getOrDefault("outputs0", new ArrayList<>());
-            List<String> VW0List = tallyResultForVW.getOrDefault("VW0", new ArrayList<>());
+            //List<String> VW0List = tallyResultForVW.getOrDefault("VW0", new ArrayList<>());
             outputs0List.add(outputs0);
-            VW0List.add(VW0);
+            //VW0List.add(VW0);
             // 将输出列表和 VW0 列表放入 tallyResultForSingleVote map 中
             tallyResultForOutput.put("outputs0", outputs0List);
-            tallyResultForVW.put("VW0", VW0List);
+            //tallyResultForVW.put("VW0", VW0List);
 
             // 将选民ID作为键，outputs0List 和 VW0List 组成的列表作为值，添加到计数结果 Map 中
             outputsResult.put(votes.getVoterId(), tallyResultForOutput.get("outputs0"));
-            vwResult.put(votes.getVoterId(), tallyResultForVW.get("VW0"));
+            vwResult[i]=VW0;
+            i++;
         }
 
         // 创建 TallyResult 对象，并将计数结果设置为其值

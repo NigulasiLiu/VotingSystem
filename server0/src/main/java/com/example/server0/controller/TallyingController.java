@@ -34,5 +34,6 @@ public class TallyingController {
     public List<VoteData> getList() {
         return kList;
     }
+
 }
 
