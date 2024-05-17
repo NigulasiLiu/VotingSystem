@@ -7,5 +7,5 @@ import java.util.List;
 public  interface TallyingService {
 
     // 实现 TallyingService 接口中的 computeTally 方法
-    TallyResult computeTally();
+   List<byte[]> computeTally(List<byte[]> outputs0,String[] nHonest);
 }

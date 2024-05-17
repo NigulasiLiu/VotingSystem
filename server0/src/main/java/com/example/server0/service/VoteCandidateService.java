@@ -12,7 +12,7 @@ import java.util.Map;
 
 @Service
 public class VoteCandidateService {
-    @Resource
+    @Autowired
     private  VoteCandidateMapper voteCandidateMapper;
 
     public  int countCandidatesByVoteId(Integer voteId) {

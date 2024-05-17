@@ -1,31 +1,27 @@
 package com.example.server0.service.eval;
 
-import com.example.server0.model.Vote;
-import com.example.server0.model.VoteVoter;
+
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Random;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+
 
 import static com.example.server0.service.eval.ConvertG.Convert;
 import static com.example.server0.service.eval.Getbit.getbit;
 import static com.example.server0.service.eval.Hash.hashBit;
-import static com.example.server0.service.eval.HashPrime.hash;
+
 import static com.example.server0.service.eval.HashPrime.hashPrime;
 import static com.example.server0.service.eval.PG.pg;
 
 public class Eval {
-    private BigInteger[] outputs0;
+    private byte[] outputs0;
     private String VW0;
 
-    public Eval(BigInteger[] outputs0, String VW0) {
+    public Eval(byte[] outputs0, String VW0) {
         this.outputs0 = outputs0;
         this.VW0 = VW0;
     }
 
-    public BigInteger[] getOutputs0() {
+    public byte[] getOutputs0() {
         return outputs0;
     }
 
@@ -33,11 +29,16 @@ public class Eval {
         return VW0;
     }
 
+
+
+
+    //这里需要一个候选人的数量依照对应的voteId，然后输入数量
     // Eval 函数
-    public static Eval eval(String votes, int[] value,int lamda) {
-        int eta = value.length;
+    public static Eval eval(String votes, int nums,int lamda) {
+
+        int eta = nums;
         // 初始化输出数组、验证参数和值
-        BigInteger[] outputs0 = new BigInteger[eta];
+        byte[] outputs0 = new byte[eta];
         BigInteger val = BigInteger.ZERO;
         BigInteger pi = BigInteger.ZERO;
         int n = (int) Math.ceil(Math.log(eta) / Math.log(2));
@@ -53,7 +54,7 @@ public class Eval {
         // 遍历每个输入值
         for (int omega = 0; omega < eta; omega++) {
             // 获取当前输入值 x
-            BigInteger x = new BigInteger(String.valueOf(value[omega]));
+            BigInteger x = new BigInteger(String.valueOf(omega));
             String xx = x.toString(2);
 
             // 对于每个修正参数 CW(j)，执行循环
@@ -94,8 +95,8 @@ public class Eval {
                     tb=tr.xor(tb.and(tcwr));
 
                 }
-                s=sb.toString();
-                t=tb.toString();
+                s=sb.toString(2);
+                t=tb.toString(2);
             }
             //现在是得出y
             String sN=Convert(s);
@@ -126,9 +127,10 @@ public class Eval {
 
                 ver=ver.xor(Q);
             }
+            byte yy = y.byteValue();
 
 
-            outputs0[omega]=y;
+            outputs0[omega]=yy;
             val=val.add(y);
             pi=pi.xor(ver);
 

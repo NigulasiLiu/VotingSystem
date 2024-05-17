@@ -45,7 +45,7 @@ public class ParseK {
     public static ParseK parseVotes(String votes, int lambda) {
         int cwLength = lambda + 2; // 每个 CW 的长度
         int csLength = 4 * lambda; // cs 的长度
-        int posLength = 1; // pos 的长度
+        int posLength = 8; // pos 的长度
 
         // 计算 s 和 t 的长度
         int sLength = lambda;
