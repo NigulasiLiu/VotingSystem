@@ -5,11 +5,6 @@ const addvote = ({ name, deadline, num }) => {
   return request.post('auth/addvote', { name, deadline, num });
 };
 
-// 新增投票（服务器）
-const addvote0 = ({ id }) => {
-  return request.post(`vote/${id}`);
-};
-
 // 获取投票列表
 const showvote = () => {
   return request.get('auth/showvote');
@@ -48,7 +43,6 @@ const outs = ({ id, outs0, outs1 }) => {
 
 export default {
   addvote,
-  addvote0,
   showvote,
   voteinfo,
   openvote,

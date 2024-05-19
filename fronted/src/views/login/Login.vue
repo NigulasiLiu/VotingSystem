@@ -1,24 +1,30 @@
 <template>
   <div class="container">
-    <a-card title="登录" style="text-align: center;width:25rem">
-      <a-form :model="userlogin" name="basic" :rules="loginrules" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }"
-        autocomplete="off" @finish="onFinish" @finishFailed="onFinishFailed">
-        <a-form-item label="手机号" name="tel">
-          <a-input v-model:value="userlogin.tel" />
-        </a-form-item>
+    <div class="image-container">
+      <img src="@/assets/login-image.png" alt="Login Image" class="login-image" />
+    </div>
+    <div class="form-container">
+      <a-card title="登录" style="text-align: center;width:25rem">
+        <a-form :model="userlogin" name="basic" :rules="loginrules" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }"
+          autocomplete="off" @finish="onFinish" @finishFailed="onFinishFailed">
+          <a-form-item label="手机号" name="tel">
+            <a-input v-model:value="userlogin.tel" />
+          </a-form-item>
 
-        <a-form-item label="密码" name="pass">
-          <a-input-password v-model:value="userlogin.pass" />
-        </a-form-item>
+          <a-form-item label="密码" name="pass">
+            <a-input-password v-model:value="userlogin.pass" />
+          </a-form-item>
 
-        <a-form-item :wrapper-col="{span: 24 }">
-          <a-button type="primary" html-type="submit" style="width: 50%">登&emsp;录</a-button>
-        </a-form-item>
-      </a-form>
-      <a-button type="link" @click="$router.replace({name:'register'})">还没注册？</a-button>
-    </a-card>
+          <a-form-item :wrapper-col="{span: 24 }">
+            <a-button type="primary" html-type="submit" style="width: 50%">登&emsp;录</a-button>
+          </a-form-item>
+        </a-form>
+        <a-button type="link" @click="$router.replace({name:'register'})">还没注册？</a-button>
+      </a-card>
+    </div>
   </div>
 </template>
+
 <script setup>
 import { reactive } from 'vue';
 import { useRouter } from 'vue-router';
@@ -82,15 +88,30 @@ const onFinishFailed = (errors) => {
   console.log(errors);
 };
 </script>
+
 <style scoped>
 .container {
-  text-align: -webkit-center;
-  margin: 0;
-  padding: 0;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
-  height: 80vh;
+  justify-content: center;
+}
+
+.image-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-image {
+  max-width: 80%;
+  height: auto;
+}
+
+.form-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

@@ -66,10 +66,7 @@ func Eval(ID int, voteid int, k []byte) {
 			}
 		}
 
-		y := Convert(s) + and(t, CW[n+1])
-		if y == byte(2) {
-			y = byte(0)
-		}
+		y := toComplement((-1)*int(Convert(s)+and(t, CW[n+1])), 1)[0]
 		Pi := Hash(concat(x, s))
 		t = Getbit(s, toInt(pos))
 		ver := HashPrime(cs)
