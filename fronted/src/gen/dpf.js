@@ -52,11 +52,11 @@ function dpfGen(a, beta, eta, id) {
       k0 = share.concat(k0, CW);
       k1 = share.concat(k1, CW);
       s0 = share.xor(S0[keep], share.and(share.toComplement(t0, 1), scw));
-      t0 = share.toInt(share.xor(share.toComplement(T0[keep], 1), share.and(share.toComplement(t0, 1), tcw[keep])));
+      t0 = share.xor(share.toComplement(T0[keep], 1), share.and(share.toComplement(t0, 1), tcw[keep]));
       s1 = share.xor(S1[keep], share.and(share.toComplement(t1, 1), scw));
       t1 = share.xor(share.toComplement(T1[keep]), share.and(t1, tcw[keep]));
     }
-    const CW = share.and(share.toComplement((-1) ** t1, lambda + 2), beta - share.Convert(s0) + share.Convert(s1));
+    const CW = share.ConvertCW(beta, t1, s0, s1);
     k0 = share.concat(k0, CW);
     k1 = share.concat(k1, CW);
     const pi = new Array(2);

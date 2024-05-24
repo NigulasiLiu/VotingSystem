@@ -4,8 +4,8 @@
       <img src="@/assets/homepage-image.png" alt="Homepage Image" class="home-image" />
     </div>
     <div class="content-section">
-      <h1>欢迎使用电子投票系统</h1>
-      <p>快速、安全、便捷的在线投票体验</p>
+      <h1>在线电子投票系统</h1>
+      <p>基于函数秘密共享</p>
       <a-button type="primary" size="large" @click="$router.replace({ name: 'votinglist' })">
         查看投票列表
       </a-button>
@@ -18,7 +18,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 70vh;
+  height: 72vh;
   text-align: center;
   background-color: #f0f2f5;
   padding: 0 2rem;

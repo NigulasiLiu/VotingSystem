@@ -23,7 +23,7 @@
         </a-descriptions>
       </a-card>
       <a-divider>候选人列表</a-divider>
-      <a-list v-if="participateData.list" :grid="{ xs: 1, sm: 2, md: 2, lg: 3, xl: 4, xxl: 6 }" item-layout="vertical"
+      <a-list v-if="participateData.list" :grid="{ xs: 1, sm: 2, md: 2, lg: 3, xl: 3, xxl: 4 }" item-layout="vertical"
         size="large" :data-source="participateData.list">
         <template #renderItem="{ item }">
           <a-list-item :key="item.ID">

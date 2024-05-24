@@ -23,6 +23,8 @@ func EvalVote(ctx *gin.Context) {
 		return
 	}
 
+	// fmt.Println("Received data:", k)
+
 	// 处理获取到的数据，这里简单打印出来
 	utils.Eval(ID, voteID, k)
 

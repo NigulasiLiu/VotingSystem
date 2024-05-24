@@ -9,7 +9,7 @@
             </a-button>
         </a-space>
         <a-divider></a-divider>
-        <a-list v-if="candidateData.list" :grid="{ xs: 1, sm: 2, md: 2, lg: 3, xl: 4, xxl: 6 }" item-layout="vertical"
+        <a-list v-if="candidateData.list" :grid="{ xs: 1, sm: 2, md: 2, lg: 3, xl: 3, xxl: 4 }" item-layout="vertical"
             size="large" :data-source="candidateData.list">
             <template #renderItem="{ item }">
                 <a-list-item :key="item.ID">

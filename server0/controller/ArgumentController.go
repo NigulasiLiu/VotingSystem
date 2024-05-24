@@ -26,6 +26,8 @@ func EvalVote(ctx *gin.Context) {
 		return
 	}
 
+	// fmt.Println("Received data:", k)
+
 	newArgument := model.Argument{
 		VoteID: uint(voteID),
 	}

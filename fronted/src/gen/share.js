@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-bitwise */
 /* eslint-disable no-plusplus */
@@ -55,13 +56,23 @@ function Hash(bitArray) {
   return extendedBitArray.slice(0, targetLength); // 截取目标长度的比特数组
 }
 
-function Convert(bitArray) {
-  return bitArray[0];
+function toInt(bitArray) {
+  // 确保输入的数组不为空
+  if (!bitArray || bitArray.length === 0) {
+    return 0;
+  }
+
+  let result = 0n;
+  for (let i = 0; i < bitArray.length; i++) {
+    // 将比特位转换为整数并累加到结果中
+    result = (result << 1n) | BigInt(bitArray[i]);
+  }
+  return result;
 }
 
 function toComplement(integer, targetLength) {
   // 获取整数的绝对值
-  const absInteger = Math.abs(integer);
+  const absInteger = integer >= 0 ? integer : 0n - integer;
 
   // 将整数转换为二进制字符串
   let binaryString = absInteger.toString(2);
@@ -100,6 +111,11 @@ function toComplement(integer, targetLength) {
   }
 
   return binaryString.split('').map(Number);
+}
+
+function ConvertCW(t1, beta, s0, s1) {
+  const result = toComplement((-1n) ** (BigInt(t1)) * (BigInt(beta) - toInt(s0) + toInt(s1)));
+  return result;
 }
 
 function generateRandomBitArray(targetLength) {
@@ -192,25 +208,11 @@ function sub(bitArray1, bitArray2) {
   return result;
 }
 
-function toInt(bitArray) {
-  // 确保输入的数组不为空
-  if (!bitArray || bitArray.length === 0) {
-    return 0;
-  }
-
-  let result = 0;
-  for (let i = 0; i < bitArray.length; i++) {
-    // 将比特位转换为整数并累加到结果中
-    result = (result << 1) | bitArray[i];
-  }
-  return result;
-}
-
 export default {
   PG,
   Getbit,
   Hash,
-  Convert,
+  ConvertCW,
   toComplement,
   generateRandomBitArray,
   xor,
