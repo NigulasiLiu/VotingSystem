@@ -2,8 +2,11 @@ package utils
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"log"
 	"math"
+	"math/big"
 	"server1/common"
 	"server1/model"
 )
@@ -28,20 +31,21 @@ func Eval(ID int, voteid int, k []byte) {
 		CW[j] = k[i : i+lambda+2]
 		i += lambda + 2
 	}
+	fmt.Println(CW[n+1])
 	cs := k[i : i+4*lambda]
 	i += 4 * lambda
 	pos := k[i : i+8]
 
 	// 初始化 outputs
-	outputs := make([]byte, int(eta))
+	outputs := make([]*big.Int, int(eta))
 	pi := make([]byte, 2*lambda)
-	val := byte(0)
-	VW := make([]byte, 2*lambda+1)
+	val := big.NewInt(0)
+	VW := make([]byte, 4*lambda)
 
 	for w := 0; w < int(eta); w++ {
 		s := const_s
 		t := const_t
-		x := toComplement(w, n)
+		x := toComplement(big.NewInt(int64(w)), n)
 		scw := make([]byte, lambda)
 		tcw := make([]byte, 2)
 		for j := 1; j <= n; j++ {
@@ -58,17 +62,33 @@ func Eval(ID int, voteid int, k []byte) {
 			T[1] = tmp[2*lambda+1]
 
 			if x[j-1] == 0 {
-				s = xor(S[0], []byte{and(t, scw)})
-				t = T[0] ^ (t & tcw[0])
+				if t == 1 {
+					s = xor(S[0], scw)
+				} else {
+					s = S[0]
+				}
+				t = T[0] ^ (t * tcw[0])
 			} else {
-				s = xor(S[0], []byte{and(t, scw)})
-				t = T[1] ^ (t & tcw[1])
+				if t == 1 {
+					s = xor(S[1], scw)
+				} else {
+					s = S[1]
+				}
+				t = T[1] ^ (t * tcw[1])
 			}
 		}
-
-		y := toComplement((-1)*int(Convert(s)+and(t, CW[n+1])), 1)[0]
+		fmt.Println(s)
+		y := Convert(s)
+		fmt.Println(y)
+		ycg := toInt(CW[n+1])
+		fmt.Println(ycg)
+		if t == 1 {
+			y.Add(y, ycg)
+		}
+		y.Mul(y, big.NewInt(-1))
+		fmt.Println(y)
 		Pi := Hash(concat(x, s))
-		t = Getbit(s, toInt(pos))
+		t = Getbit(s, int(toInt(pos).Int64()))
 		ver := HashPrime(cs)
 		if t == 0 {
 			ver = xor(ver, HashPrime(Pi))
@@ -76,9 +96,9 @@ func Eval(ID int, voteid int, k []byte) {
 			ver = xor(ver, HashPrime(xor(Pi, cs)))
 		}
 		outputs[w] = y
-		val += y
+		val.Add(val, y)
 		pi = xor(pi, ver)
-		VW = concat(pi, []byte{val})
+		VW = concat(pi, toComplement(val, 2*lambda))
 	}
 
 	var argument model.Argument
@@ -89,9 +109,20 @@ func Eval(ID int, voteid int, k []byte) {
 		return
 	}
 
+	var outputStrings []string
+	for _, output := range outputs {
+		outputStrings = append(outputStrings, output.String())
+	}
+
+	// Marshal the string array to JSON
+	outputsJSON, err := json.Marshal(outputStrings)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// 更新记录的特定字段
 	argument.VW1 = VW
-	argument.Outputs1 = outputs
+	argument.Outputs1 = string(outputsJSON)
 
 	// 保存更改
 	if err := db.Save(&argument).Error; err != nil {
@@ -103,7 +134,7 @@ func Eval(ID int, voteid int, k []byte) {
 
 }
 
-func Tallying(voteid int, N int, eta int) []int {
+func Tallying(voteid int, N int, eta int) []*big.Int {
 	db := common.GetDB()
 
 	// 查找与 voteid 匹配的记录
@@ -114,19 +145,39 @@ func Tallying(voteid int, N int, eta int) []int {
 	}
 
 	// 初始化 outs 数组
-	outs := make([]int, eta)
+	outs := make([]*big.Int, eta)
+	for i := range outs {
+		outs[i] = big.NewInt(0)
+	}
 
 	// 遍历记录并进行累加
 	for w := 0; w < N; w++ {
-		for i := 0; i < eta; i++ {
-			outs[i] += int(arguments[w].Outputs0[i])
+		var outputStrings []string
+		if err := json.Unmarshal([]byte(arguments[w].Outputs1), &outputStrings); err != nil {
+			fmt.Println("Failed to parse Outputs1 JSON:", err)
+			return nil
+		}
+
+		// 调试输出解析后的字符串数组
+		// fmt.Println("Parsed output strings:", outputStrings)
+
+		// 转换为 big.Int 数组并累加
+		for i, outputStr := range outputStrings {
+			output := new(big.Int)
+			if _, ok := output.SetString(outputStr, 10); !ok {
+				fmt.Println("Failed to convert string to big.Int:", outputStr)
+				return nil
+			}
+			outs[i].Add(outs[i], output)
 		}
 	}
 
+	// 调试输出累加后的 outs 数组
+	// fmt.Println("Tallying result:", outs)
 	return outs
 }
 
-func Verify(voteid int, N int, outs []int) []int {
+func Verify(voteid int, N int, outs []*big.Int) []*big.Int {
 	db := common.GetDB()
 
 	// 查找与 voteid 匹配的记录
@@ -137,22 +188,45 @@ func Verify(voteid int, N int, outs []int) []int {
 	}
 
 	// 实现减法
-	sub := func(a []int, b []byte) []int {
-		result := make([]int, len(a))
+	sub := func(a []*big.Int, b []*big.Int) []*big.Int {
+		result := make([]*big.Int, len(a))
 		for i := range a {
-			result[i] = a[i] - int(b[i])
+			result[i] = new(big.Int).Sub(a[i], b[i])
 		}
 		return result
 	}
 
 	for w := 0; w < N; w++ {
+		fmt.Printf("Processing argument %d\n", w)
+
+		// 解析 Outputs1 的 JSON 字符串为字符串数组
+		var outputStrings []string
+		if err := json.Unmarshal([]byte(arguments[w].Outputs1), &outputStrings); err != nil {
+			fmt.Println("Failed to parse Outputs1 JSON:", err)
+			return nil
+		}
+		// fmt.Printf("Parsed Outputs1 JSON for argument %d: %v\n", w, outputStrings)
+
+		// 转换为 big.Int 数组
+		var outputs1 []*big.Int
+		for _, outputStr := range outputStrings {
+			output := new(big.Int)
+			if _, ok := output.SetString(outputStr, 10); !ok {
+				fmt.Println("Failed to convert string to big.Int:", outputStr)
+				return nil
+			}
+			outputs1 = append(outputs1, output)
+		}
+		// fmt.Printf("Converted Outputs1 to big.Int array for argument %d: %v\n", w, outputs1)
+
 		pi0 := arguments[w].VW0[:2*lambda]
 		val0 := arguments[w].VW0[2*lambda]
 		pi1 := arguments[w].VW1[:2*lambda]
 		val1 := arguments[w].VW1[2*lambda]
 
 		if !bytes.Equal(pi0, pi1) || (val0+val1 < 0) || (val0+val1 > 1) {
-			outs = sub(outs, arguments[w].Outputs0)
+			outs = sub(outs, outputs1)
+			fmt.Printf("Updated outs after subtraction for argument %d: %v\n", w, outs)
 		}
 	}
 

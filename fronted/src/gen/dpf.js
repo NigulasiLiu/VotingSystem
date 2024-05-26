@@ -3,7 +3,7 @@
 import votedService from '@/service/votedService';
 import share from './share';
 
-const lambda = 256;
+const lambda = 128;
 
 function genRandom(n) {
   return share.generateRandomBitArray(lambda + 1 + (n + 1) * (lambda + 2) + 4 * lambda + 8);
@@ -17,8 +17,14 @@ function dpfGen(a, beta, eta, id) {
     const alpha = share.toComplement(a, n);
     let s0 = share.generateRandomBitArray(lambda);
     let s1 = share.generateRandomBitArray(lambda);
+    // let s0 = new Uint8Array(lambda);
+    // let s1 = new Uint8Array(lambda);
+    // s0.set([0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0]);
+    // s1.set([1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1]);
     let t0 = Math.random() < 0.5 ? 0 : 1;
     let t1 = t0 === 1 ? 0 : 1;
+    // let t0 = 0;
+    // let t1 = 1;
     k0 = s0;
     k0 = share.concat(k0, share.toComplement(t0, 1));
     k1 = s1;
@@ -42,19 +48,27 @@ function dpfGen(a, beta, eta, id) {
       const keep = alpha[j];
       const lose = keep === 1 ? 0 : 1;
       const scw = share.xor(S0[lose], S1[lose]);
-      const tcw = new Array(2);
-      tcw[0] = share.xor(share.xor(share.xor(share.toComplement(T0[0], 1), share.toComplement(T1[0], 1)), alpha[j]), [1]);
-      tcw[1] = share.xor(share.xor(share.toComplement(T0[1], 1), share.toComplement(T1[1], 1)), share.toComplement(alpha[j]));
-      const CW = new Uint8Array(scw.length + tcw[0].length + tcw[1].length);
+      const tcw = new Uint8Array(2);
+      tcw[0] = T0[0] ^ T1[0] ^ alpha[j] ^ 1;
+      tcw[1] = T0[1] ^ T1[1] ^ alpha[j];
+      const CW = new Uint8Array(scw.length + 2);
       CW.set(scw);
-      CW.set(tcw[0], scw.length);
-      CW.set(tcw[1], scw.length + tcw[0].length);
+      CW.set(share.toComplement(tcw[0], 1), scw.length);
+      CW.set(share.toComplement(tcw[1], 1), scw.length + 1);
       k0 = share.concat(k0, CW);
       k1 = share.concat(k1, CW);
-      s0 = share.xor(S0[keep], share.and(share.toComplement(t0, 1), scw));
-      t0 = share.xor(share.toComplement(T0[keep], 1), share.and(share.toComplement(t0, 1), tcw[keep]));
-      s1 = share.xor(S1[keep], share.and(share.toComplement(t1, 1), scw));
-      t1 = share.xor(share.toComplement(T1[keep]), share.and(t1, tcw[keep]));
+      if (t0 === 0) {
+        s0 = S0[keep];
+      } else {
+        s0 = share.xor(S0[keep], scw);
+      }
+      t0 = T0[keep] ^ (t0 * tcw[keep]);
+      if (t1 === 0) {
+        s1 = S1[keep];
+      } else {
+        s1 = share.xor(S1[keep], scw);
+      }
+      t1 = T1[keep] ^ (t1 * tcw[keep]);
     }
     const CW = share.ConvertCW(beta, t1, s0, s1);
     k0 = share.concat(k0, CW);

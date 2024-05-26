@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"net/http"
@@ -26,10 +27,12 @@ func EvalVote(ctx *gin.Context) {
 		return
 	}
 
-	// fmt.Println("Received data:", k)
+	fmt.Println("Received data:", k)
 
 	newArgument := model.Argument{
-		VoteID: uint(voteID),
+		VoteID:   uint(voteID),
+		Outputs0: "[]",
+		Outputs1: "[]",
 	}
 	db := common.GetDB()
 	db.Create(&newArgument)
@@ -55,9 +58,21 @@ func Compute(ctx *gin.Context) {
 	var eta int64
 	db.Model(&model.Participate{}).Where("vote_id = ?", voteID).Count(&eta)
 
+	// 计算 outs
 	outs := utils.Tallying(voteID, int(N), int(eta))
 
+	// 验证 outs
 	outs = utils.Verify(voteID, int(N), outs)
 
-	response.Success(ctx, gin.H{"outs": outs}, "获取成功")
+	// 将大整数转换为字符串
+	outsString := make([]string, len(outs))
+	for i, out := range outs {
+		outsString[i] = out.String()
+	}
+
+	// 返回 JSON 响应
+	ctx.JSON(http.StatusOK, gin.H{
+		"outs":    outsString,
+		"message": "获取成功",
+	})
 }

@@ -2,7 +2,7 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-bitwise */
 /* eslint-disable no-plusplus */
-const lambda = 256;
+const lambda = 128;
 
 function PG(bitArray) {
   const extendedBitArray = new Uint8Array(bitArray.length * 2 + 2); // 扩展后的比特数组
@@ -59,7 +59,7 @@ function Hash(bitArray) {
 function toInt(bitArray) {
   // 确保输入的数组不为空
   if (!bitArray || bitArray.length === 0) {
-    return 0;
+    return 0n;
   }
 
   let result = 0n;
@@ -72,7 +72,7 @@ function toInt(bitArray) {
 
 function toComplement(integer, targetLength) {
   // 获取整数的绝对值
-  const absInteger = integer >= 0 ? integer : 0n - integer;
+  const absInteger = integer >= 0n ? integer : 0n - integer;
 
   // 将整数转换为二进制字符串
   let binaryString = absInteger.toString(2);
@@ -88,7 +88,7 @@ function toComplement(integer, targetLength) {
   }
 
   // 如果原始整数为负数，则计算其补码
-  if (integer < 0) {
+  if (integer < 0n) {
     // 计算反码（将所有位取反）
     let onesComplement = '';
     for (let i = 0; i < binaryString.length; i++) {
@@ -96,10 +96,10 @@ function toComplement(integer, targetLength) {
     }
 
     // 将反码转换为数字
-    const onesComplementNumber = parseInt(onesComplement, 2);
+    const onesComplementNumber = BigInt(`0b${onesComplement}`);
 
     // 计算补码（反码加1）
-    const twosComplementNumber = onesComplementNumber + 1;
+    const twosComplementNumber = onesComplementNumber + 1n;
 
     // 将补码转换为二进制字符串
     binaryString = twosComplementNumber.toString(2);
@@ -113,8 +113,12 @@ function toComplement(integer, targetLength) {
   return binaryString.split('').map(Number);
 }
 
-function ConvertCW(t1, beta, s0, s1) {
-  const result = toComplement((-1n) ** (BigInt(t1)) * (BigInt(beta) - toInt(s0) + toInt(s1)));
+function ConvertCW(beta, t1, s0, s1) {
+  if (t1 === 0) {
+    const result = toComplement(BigInt(beta) - toInt(s0) + toInt(s1), lambda + 2);
+    return result;
+  }
+  const result = toComplement((-1n) * (BigInt(beta) - toInt(s0) + toInt(s1)), lambda + 2);
   return result;
 }
 
@@ -135,30 +139,29 @@ function xor(bitArray1, bitArray2) {
   // 创建结果数组
   const result = new Uint8Array(maxLength);
 
+  // 创建填充后的比特数组
+  const paddedBitArray1 = new Uint8Array(maxLength);
+  const paddedBitArray2 = new Uint8Array(maxLength);
+
+  // 前导零填充
+  paddedBitArray1.set(bitArray1, maxLength - bitArray1.length);
+  paddedBitArray2.set(bitArray2, maxLength - bitArray2.length);
+
   // 执行异或操作
   for (let i = 0; i < maxLength; i++) {
-    const bit1 = i < bitArray1.length ? bitArray1[i] : 0; // 获取bitArray1的当前比特位，如果越界则补0
-    const bit2 = i < bitArray2.length ? bitArray2[i] : 0; // 获取bitArray2的当前比特位，如果越界则补0
-    result[i] = bit1 ^ bit2; // 执行异或操作
+    result[i] = paddedBitArray1[i] ^ paddedBitArray2[i];
   }
 
   return result;
 }
 
 function and(bitArray1, bitArray2) {
-  // 获取两个比特数组的长度
-  const maxLength = Math.max(bitArray1.length, bitArray2.length);
-
-  // 创建结果数组
-  const result = new Uint8Array(maxLength);
-
-  // 执行位与操作
-  for (let i = 0; i < maxLength; i++) {
-    const bit1 = i < bitArray1.length ? bitArray1[i] : 0; // 获取bitArray1的当前比特位，如果越界则补0
-    const bit2 = i < bitArray2.length ? bitArray2[i] : 0; // 获取bitArray2的当前比特位，如果越界则补0
-    result[i] = bit1 & bit2; // 执行位与操作
+  const result = new Uint8Array(1);
+  if (bitArray1 === 0) {
+    result[0] = 0;
+    return result;
   }
-
+  result[0] = bitArray2[bitArray2.length - 1];
   return result;
 }
 

@@ -1,22 +1,19 @@
 package utils
 
 import (
-	"crypto/sha512"
+	"crypto/sha256"
 	"fmt"
-	"math"
-	"math/rand"
-	"time"
+	"math/big"
+	"strings"
 )
 
-const lambda = 256
+const lambda = 128
 
 func PG(bitArray []byte) []byte {
 	extendedBitArray := make([]byte, len(bitArray)*2+2) // 创建扩展后的比特数组
 
-	seed := int(bitArray[0])         // 种子值初始化为第一个比特位
-	rand.Seed(time.Now().UnixNano()) // 使用当前时间作为随机数种子
-
-	extendedIndex := 0 // 扩展比特数组的索引
+	seed := int(bitArray[0]) // 种子值初始化为第一个比特位
+	extendedIndex := 0       // 扩展比特数组的索引
 
 	// 循环生成比特串
 	for i := 0; i < len(bitArray); i++ {
@@ -78,30 +75,42 @@ func Hash(bitArray []byte) []byte {
 	return extendedBitArray[:targetLength] // 截取目标长度的比特数组
 }
 
-func Convert(bitArray []byte) byte {
-	return bitArray[0]
+func Convert(bitArray []byte) *big.Int {
+	// 确保输入的数组不为空
+	if len(bitArray) == 0 {
+		return big.NewInt(0)
+	}
+
+	// 初始化结果为0
+	result := big.NewInt(0)
+
+	// 遍历比特数组
+	for _, bit := range bitArray {
+		// 将比特位转换为BigInt类型并左移一位，然后与结果进行或运算
+		result.Lsh(result, 1)
+		result.Or(result, big.NewInt(int64(bit)))
+	}
+
+	return result
 }
 
-func toComplement(integer int, targetLength int) []byte {
+func toComplement(integer *big.Int, targetLength int) []byte {
 	// 获取整数的绝对值
-	absInteger := int(math.Abs(float64(integer)))
+	absInteger := new(big.Int).Abs(integer)
 
-	// 将整数转换为二进制字符串
+	// 转换为二进制字符串
 	binaryString := fmt.Sprintf("%b", absInteger)
 
-	// 如果目标长度大于二进制字符串的长度，则在前面添加零
-	for len(binaryString) < targetLength {
-		binaryString = "0" + binaryString
-	}
-
-	// 如果目标长度小于二进制字符串的长度，则截取最后 targetLength 位
+	// 确保字符串长度不超过目标长度
 	if len(binaryString) > targetLength {
 		binaryString = binaryString[len(binaryString)-targetLength:]
+	} else {
+		binaryString = strings.Repeat("0", targetLength-len(binaryString)) + binaryString
 	}
 
-	// 如果原始整数为负数，则计算其补码
-	if integer < 0 {
-		// 计算反码（将所有位取反）
+	// 处理负数情况
+	if integer.Sign() < 0 {
+		// 计算反码
 		onesComplement := ""
 		for _, bit := range binaryString {
 			if bit == '0' {
@@ -111,26 +120,26 @@ func toComplement(integer int, targetLength int) []byte {
 			}
 		}
 
-		// 将反码转换为数字
-		onesComplementNumber := 0
-		for _, bit := range onesComplement {
-			onesComplementNumber = onesComplementNumber*2 + int(bit-'0')
-		}
+		// 转换反码为big.Int
+		onesComplementInt := new(big.Int)
+		onesComplementInt.SetString(onesComplement, 2)
 
-		// 计算补码（反码加1）
-		twosComplementNumber := onesComplementNumber + 1
+		// 计算补码
+		twosComplementInt := new(big.Int).Add(onesComplementInt, big.NewInt(1))
 
-		// 将补码转换为二进制字符串
-		binaryString = fmt.Sprintf("%b", twosComplementNumber)
+		// 转换补码为二进制字符串
+		binaryString = fmt.Sprintf("%b", twosComplementInt)
 
-		// 如果二进制字符串的长度超过目标长度，则截取最后 targetLength 位
+		// 确保字符串长度不超过目标长度
 		if len(binaryString) > targetLength {
 			binaryString = binaryString[len(binaryString)-targetLength:]
+		} else {
+			binaryString = strings.Repeat("0", targetLength-len(binaryString)) + binaryString
 		}
 	}
 
-	// 将二进制字符串转换为 []byte
-	result := make([]byte, len(binaryString))
+	// 转换为字节数组
+	result := make([]byte, targetLength)
 	for i, bit := range binaryString {
 		result[i] = byte(bit - '0')
 	}
@@ -220,21 +229,36 @@ func concat(arr1, arr2 []byte) []byte {
 	return result
 }
 
-func toInt(bits []byte) int {
-	result := 0
-	for i := 0; i < len(bits); i++ {
-		result = result << 1
-		result += int(bits[i])
+func toInt(bits []byte) *big.Int {
+	if len(bits) == 0 {
+		return big.NewInt(0)
 	}
+
+	// 判断最高位是否为1，即是否为负数
+	isNegative := bits[0] == 1
+
+	result := big.NewInt(0)
+	for i := 0; i < len(bits); i++ {
+		result.Mul(result, big.NewInt(2))
+		result.Add(result, big.NewInt(int64(bits[i])))
+	}
+
+	// 如果是负数，计算补码的原码
+	if isNegative {
+		// 计算补码的原码
+		complement := new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), uint(len(bits))), result)
+		result.Neg(complement)
+	}
+
 	return result
 }
 
 func HashPrime(input []byte) []byte {
-	// Compute the SHA-512 hash
-	hash := sha512.Sum512(input)
+	// Compute the SHA-256 hash
+	hash := sha256.Sum256(input)
 
-	// Convert the hash to a bit array (512 bits)
-	bitArray := make([]byte, 512)
+	// Convert the hash to a bit array (256 bits)
+	bitArray := make([]byte, 256)
 	for i, b := range hash {
 		for j := 0; j < 8; j++ {
 			bitArray[i*8+j] = (b >> (7 - j)) & 1

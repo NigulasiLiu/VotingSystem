@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"math/big"
 	"net/http"
 	"strconv"
 	"test/common"
@@ -176,64 +177,71 @@ func ComputeVote(ctx *gin.Context) {
 }
 
 type OutsRequest struct {
-	Outs0 []int `json:"outs0"`
-	Outs1 []int `json:"outs1"`
+	Outs0 []*big.Int `json:"outs0"`
+	Outs1 []*big.Int `json:"outs1"`
 }
 
+// PutOuts handles the HTTP request to process and store outs
 func PutOuts(ctx *gin.Context) {
-	voteId, _ := strconv.Atoi(ctx.Params.ByName("id"))
+	// Extract voteID from the request parameters
+	voteID, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid vote ID"})
+		return
+	}
 
+	// Parse the JSON request body
 	var outsRequest OutsRequest
-
-	// 解析JSON请求体
 	if err := ctx.ShouldBindJSON(&outsRequest); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
 	}
 
+	// Ensure outs0 and outs1 have the same length
 	if len(outsRequest.Outs0) != len(outsRequest.Outs1) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Outs0 and Outs1 arrays must have the same length"})
 		return
 	}
 
-	outs := make([]int, len(outsRequest.Outs0))
-
-	// 按位相加
-	for i := 0; i < len(outsRequest.Outs0); i++ {
-		outs[i] = outsRequest.Outs0[i] + outsRequest.Outs1[i]
+	// Calculate the sum of corresponding elements in outs0 and outs1
+	outs := make([]*big.Int, len(outsRequest.Outs0))
+	for i := range outsRequest.Outs0 {
+		outs[i] = new(big.Int).Add(outsRequest.Outs0[i], outsRequest.Outs1[i])
 	}
 
 	db := common.GetDB()
-	// 查找并加载要更新的记录
+
+	// Find the vote record by ID
 	var vote model.Vote
-	if err := db.Where("id = ?", voteId).First(&vote).Error; err != nil {
+	if err := db.Where("id = ?", voteID).First(&vote).Error; err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"error": "Record not found"})
 		return
 	}
 
+	// Update the state of the vote
 	vote.State = 4
-	// 保存更改
 	if err := db.Save(&vote).Error; err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update record"})
 		return
 	}
 
-	// 获取参与记录，按ID递增排序
+	// Retrieve the participates records for the given vote ID, ordered by ID
 	var participates []model.Participate
-	if err := db.Where("vote_id = ?", voteId).Order("id asc").Find(&participates).Error; err != nil {
+	if err := db.Where("vote_id = ?", voteID).Order("id asc").Find(&participates).Error; err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve participates"})
 		return
 	}
 
-	// 检查参与记录数量是否与outs长度一致
+	// Ensure the number of participates matches the number of outs
 	if len(participates) != len(outs) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Number of participate records does not match number of outs"})
 		return
 	}
 
-	// 按顺序给participates表中vote_id=voteId的项赋上值outs[i]
+	// Update the participates records with the calculated outs
 	for i, participate := range participates {
-		if err := db.Model(&participate).Update("outs", outs[i]).Error; err != nil {
+		// Update the outs field of each participate record
+		if err := db.Model(&participate).Update("outs", outs[i].String()).Error; err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update participates"})
 			return
 		}

@@ -1,12 +1,12 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"net/http"
 	"server1/common"
 	"server1/model"
-	"server1/response"
 	"server1/utils"
 	"strconv"
 )
@@ -23,7 +23,7 @@ func EvalVote(ctx *gin.Context) {
 		return
 	}
 
-	// fmt.Println("Received data:", k)
+	fmt.Println("Received data:", k)
 
 	// 处理获取到的数据，这里简单打印出来
 	utils.Eval(ID, voteID, k)
@@ -50,5 +50,14 @@ func Compute(ctx *gin.Context) {
 
 	outs = utils.Verify(voteID, int(N), outs)
 
-	response.Success(ctx, gin.H{"outs": outs}, "获取成功")
+	outsString := make([]string, len(outs))
+	for i, out := range outs {
+		outsString[i] = out.String()
+	}
+
+	// 返回 JSON 响应
+	ctx.JSON(http.StatusOK, gin.H{
+		"outs":    outsString,
+		"message": "获取成功",
+	})
 }

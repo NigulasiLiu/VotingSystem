@@ -1,5 +1,5 @@
 <template>
-    <a-button type="primary" @click="handleOpen" v-if="state===2">开始计票</a-button>
+  <a-button type="primary" @click="handleOpen" v-if="state===2">开始计票</a-button>
 </template>
 <script>
 import { defineComponent } from 'vue';
@@ -28,8 +28,8 @@ export default defineComponent({
             .then((res1) => {
               return voteService.outs({
                 id: this.voteid,
-                outs0: res0.data.data.outs,
-                outs1: res1.data.data.outs,
+                outs0: res0.data.outs,
+                outs1: res1.data.outs,
               });
             });
         })
