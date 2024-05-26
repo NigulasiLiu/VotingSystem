@@ -61,6 +61,8 @@ const onFinish = (values) => {
   candidateService.addcandidate({ name: values.name, detail: values.detail })
     .then(() => {
       message.success('添加成功');
+      window.location.reload(); // 刷新页面
+      window.location.href = '/manage/candidatelist'; // 设置目标页面的 URL
     }).catch((err) => {
       message.error(err.response.data.msg);
     });

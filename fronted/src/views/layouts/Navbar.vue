@@ -16,7 +16,6 @@
 <script>
 import { ref } from 'vue';
 import { mapState, mapActions } from 'vuex';
-import { useRouter } from 'vue-router';
 import { UserOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 
@@ -30,13 +29,12 @@ export default {
   methods: mapActions('userModule', ['logout']),
   setup() {
     const current = ref(['home']);
-    const router = useRouter();
     const back = () => {
       message.success('已退出');
-      router.push('/');
-      // eslint-disable-next-line no-restricted-globals
-      location.reload();
+      window.location.reload(); // 刷新页面
+      window.location.href = '/'; // 设置目标页面的 URL
     };
+
     return {
       current,
       back,

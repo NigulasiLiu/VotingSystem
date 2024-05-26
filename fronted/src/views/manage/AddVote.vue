@@ -24,10 +24,7 @@
 import voteService from '@/service/voteService';
 import dayjs from 'dayjs';
 import { reactive } from 'vue';
-import { useRouter } from 'vue-router';
 import { message } from 'ant-design-vue';
-
-const router = useRouter();
 
 const vote = reactive({
   name: '',
@@ -87,7 +84,8 @@ const onFinish = (values) => {
   voteService.addvote({ name: values.name, num: values.num, deadline: values.deadline })
     .then(() => {
       message.success('添加成功');
-      router.push({ path: '/votinglist' });
+      window.location.reload(); // 刷新页面
+      window.location.href = '/votinglist'; // 设置目标页面的 URL
     }).catch((err) => {
       message.error(err.response.data.msg);
     });
