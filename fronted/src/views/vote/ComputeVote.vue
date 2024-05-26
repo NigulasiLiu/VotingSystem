@@ -35,6 +35,7 @@ export default defineComponent({
         })
         .then(() => {
           message.success('开始计票');
+          window.location.reload(); // 刷新页面
         })
         .catch((err) => {
           // 添加失败

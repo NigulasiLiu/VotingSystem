@@ -27,6 +27,7 @@ export default defineComponent({
         .then(() => {
           // 添加成功
           message.success('已截止');
+          window.location.reload(); // 刷新页面
         })
         .catch((err) => {
           // 添加失败

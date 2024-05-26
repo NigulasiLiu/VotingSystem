@@ -60,6 +60,7 @@ export default defineComponent({
             .then(() => {
               this.visible = false;
               message.success('添加成功');
+              window.location.reload(); // 刷新页面
               return participateService.addparticipation0({ voteid: this.voteid, candidateid: values.candidateid });
             }).catch((err) => {
               message.error(err.response.data.msg);

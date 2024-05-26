@@ -53,6 +53,7 @@ export default defineComponent({
           .then((value) => {
             if (value) message.success('投票成功');
             else message.success('投票失败');
+            window.location.reload(); // 刷新页面
             resolve();
           })
           .catch((error) => {

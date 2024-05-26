@@ -23,6 +23,7 @@ export default defineComponent({
         .then(() => {
           // 添加成功
           message.success('投票已开放');
+          window.location.reload(); // 刷新页面
         })
         .catch((err) => {
           // 添加失败
