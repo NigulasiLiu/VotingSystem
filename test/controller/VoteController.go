@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"math/big"
 	"net/http"
@@ -177,8 +178,8 @@ func ComputeVote(ctx *gin.Context) {
 }
 
 type OutsRequest struct {
-	Outs0 []*big.Int `json:"outs0"`
-	Outs1 []*big.Int `json:"outs1"`
+	Outs0 []string `json:"outs0"`
+	Outs1 []string `json:"outs1"`
 }
 
 // PutOuts handles the HTTP request to process and store outs
@@ -203,10 +204,23 @@ func PutOuts(ctx *gin.Context) {
 		return
 	}
 
-	// Calculate the sum of corresponding elements in outs0 and outs1
+	// Convert the string arrays to big.Int arrays and calculate their sum
 	outs := make([]*big.Int, len(outsRequest.Outs0))
 	for i := range outsRequest.Outs0 {
-		outs[i] = new(big.Int).Add(outsRequest.Outs0[i], outsRequest.Outs1[i])
+		outs0 := new(big.Int)
+		outs1 := new(big.Int)
+
+		if _, ok := outs0.SetString(outsRequest.Outs0[i], 10); !ok {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Invalid number in outs0 at index %d", i)})
+			return
+		}
+
+		if _, ok := outs1.SetString(outsRequest.Outs1[i], 10); !ok {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Invalid number in outs1 at index %d", i)})
+			return
+		}
+
+		outs[i] = new(big.Int).Add(outs0, outs1)
 	}
 
 	db := common.GetDB()
