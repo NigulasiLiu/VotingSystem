@@ -12,11 +12,13 @@ var DB *gorm.DB
 
 func InitDB() *gorm.DB {
 	//driverName := viper.GetString("datasource.driverName")
+
+	// 获取命令行参数
+	username := viper.GetString("datasource.username")
+	password := viper.GetString("datasource.password")
 	host := viper.GetString("datasource.host")
 	port := viper.GetString("datasource.port")
 	database := viper.GetString("datasource.database")
-	username := viper.GetString("datasource.username")
-	password := viper.GetString("datasource.password")
 	charset := viper.GetString("datasource.charset")
 
 	args := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=true",

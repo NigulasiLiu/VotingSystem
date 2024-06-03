@@ -27,7 +27,7 @@ func main() {
 
 func InitConfig() {
 	workDir, _ := os.Getwd()                 //获取当前工作目录
-	viper.SetConfigName("application")       //设置要读取的文件名
+	viper.SetConfigName("application_0")     //设置要读取的文件名
 	viper.SetConfigType("yml")               //设置要读取的文件的类型
 	viper.AddConfigPath(workDir + "/config") //设置文件的路径
 	err := viper.ReadInConfig()
