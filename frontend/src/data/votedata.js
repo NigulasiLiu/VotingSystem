@@ -15,6 +15,11 @@ const voteData = reactive({
       key: 'Name',
     },
     {
+      title: '状态',
+      dataIndex: 'State',
+      key: 'State',
+    },
+    {
       title: '截止时间',
       dataIndex: 'Deadline',
       key: 'Deadline',
@@ -31,6 +36,7 @@ const voteData = reactive({
 
 function GetVoteData() {
   return voteService.showvote().then((res) => {
+    message.success('获取投票数据成功');
     return res.data.data;
   }).catch((err) => {
     message.error(err.response.data.msg);

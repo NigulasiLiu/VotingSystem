@@ -134,8 +134,8 @@ export default {
 
 <style scoped>
 .container {
-  margin: 0 auto;
-  max-width: 800px;
+  margin: 50px auto; /* 调整上边距 */
+  max-width: 1350px;
   padding: 0 20px;
 }
 </style>

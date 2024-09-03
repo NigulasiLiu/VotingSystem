@@ -1,11 +1,15 @@
 <template>
     <div class="container">
         <a-space>
-            <a-button type="link" @click="$router.replace({name:'votinglist'})">
+            <a-button type="link"
+                      size="large"
+                      @click="$router.replace({name:'votinglist'})">
                 <ArrowLeftOutlined />返回投票列表页
             </a-button>
-            <a-button type="primary" @click="$router.replace({name:'addcandidate'})">
-                新增候选人
+            <a-button type="primary"
+                      size="large"
+                      @click="$router.replace({name:'addcandidate'})">
+              <PlusOutlined /> 新增候选人
             </a-button>
         </a-space>
         <a-divider></a-divider>
@@ -15,9 +19,9 @@
                 <a-list-item :key="item.ID">
                     <a-card :title="`ID&emsp;${item.ID}`">
                         <template #actions>
-                            <router-link :to="{ name: 'editcandidate', params: { id: item.ID }}">
-                                <EditOutlined />&emsp;修改信息
-                            </router-link>
+                          <router-link :to="{ name: 'editcandidate', params: { id: item.ID }}">
+                            <EditOutlined />&emsp;<span class="edit-text">修改信息</span>
+                          </router-link>
                         </template>
                         <a-list-item-meta>
                             <template #title>
@@ -37,14 +41,25 @@
 
 <script setup>
 import { candidateData } from '@/data/candidatedata';
-import { EditOutlined, ArrowLeftOutlined } from '@ant-design/icons-vue';
+import { EditOutlined, ArrowLeftOutlined, PlusOutlined } from '@ant-design/icons-vue';
 
 </script>
 
 <style scoped>
 .container {
-    margin: 0 auto;
-    max-width: 800px;
+  margin: 0px auto; /* 调整上边距 */
+    max-width: 1350px;
     padding: 0 20px;
+}
+.edit-text {
+  //font-weight: bold;
+  color: #000000;
+  text-decoration: none;
+  cursor: pointer; /* 使鼠标悬停时显示为指针形状 */
+  //transition: color 0.3s ease; /* 渐变效果 */
+}
+
+.edit-text:hover {
+  color: #0056b3; /* 鼠标悬停时的颜色变化 */
 }
 </style>

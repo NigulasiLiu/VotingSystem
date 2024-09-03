@@ -4,10 +4,10 @@
       <img src="@/assets/homepage-image.png" alt="Homepage Image" class="home-image" />
     </div>
     <div class="content-section">
-      <h1>在线电子投票系统</h1>
-      <p>基于函数秘密共享</p>
+      <p class="subtitle">高效的隐私保护</p>
+      <h1 class="main-title">在线投票系统</h1>
       <a-button type="primary" size="large" @click="$router.replace({ name: 'votinglist' })">
-        查看投票列表
+        查看选举列表
       </a-button>
     </div>
   </div>
@@ -15,6 +15,7 @@
 
 <style scoped>
 .home-container {
+  margin-top: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -44,18 +45,23 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
+  background-color: #ffffff; /* 背景色为白色 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 添加阴影 */
 }
 
-.content-section h1 {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  color: #333;
+.subtitle {
+  font-size: 1.5rem; /* 增大字体 */
+  margin-bottom: 1rem; /* 调整与标题的间距 */
+  color: #999; /* 灰色文字 */
+  font-weight: 600; /* 加粗文字 */
 }
 
-.content-section p {
-  font-size: 1.2rem;
-  margin-bottom: 2rem;
-  color: #666;
+.main-title {
+  font-size: 4rem; /* 增大字体 */
+  margin-bottom: 2rem; /* 调整与按钮的间距 */
+  color: #333; /* 深色文字 */
+  font-weight: 800; /* 更粗字体 */
+  //text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 添加文字阴影 */
 }
 
 .content-section .ant-btn-primary {

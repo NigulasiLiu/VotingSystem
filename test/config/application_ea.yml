@@ -6,5 +6,5 @@ datasource:
   port: 3306
   database: VotingSystem
   username: root
-  password: 123456
+  password: liubq
   charset: utf8
