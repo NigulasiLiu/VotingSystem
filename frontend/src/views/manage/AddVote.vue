@@ -27,8 +27,8 @@
                 <a-input v-model:value="vote.name" />
               </a-form-item>
 
-              <a-form-item label="投票发起人联系方式" name="primaryContact">
-                <a-input v-model:value="vote.primaryContact" placeholder="请输入投票发起人联系方式" />
+              <a-form-item label="投票活动描述" name="description">
+                <a-input v-model:value="vote.description" placeholder="请输入投票活动描述" />
               </a-form-item>
 
               <a-form-item name="deadline" label="截止时间">
@@ -77,8 +77,8 @@
               <!-- 结果查看 -->
               <a-form-item label="结果查看" name="resultsViewing">
                 <a-radio-group v-model:value="vote.resultsViewing">
-                  <a-radio value="adminAnytime" class="custom-radio">管理员：投票开始后随时查看</a-radio>
                   <a-radio value="adminAfterEnd" class="custom-radio">管理员：仅在投票结束后查看</a-radio>
+                  <a-radio value="adminAnytime" class="custom-radio">管理员：投票开始后随时查看</a-radio>
                   <a-radio value="votersAfterEnd" class="custom-radio">投票人：仅在投票结束后查看</a-radio>
                   <a-radio value="votersAnytime" class="custom-radio">投票人：投票开始后随时查看</a-radio>
                   <a-radio value="adminOnly" class="custom-radio">投票人无法查看 - 仅管理员可查看</a-radio>
@@ -93,64 +93,12 @@
 
         <!-- 第2步内容：候选人 -->
         <template v-if="currentStep === 1">
-<!--          <div class="candidate-list-container">-->
+          <div class="candidate-list-container">
 <!--            <a-space>-->
 <!--              <a-button size="large" @click="$router.replace({name:'addcandidate'})">-->
 <!--                <PlusOutlined /> 新增候选人-->
 <!--              </a-button>-->
-<!--              &lt;!&ndash; 添加候选人 &ndash;&gt;-->
-<!--              <a-button type="primary" size="large" @click="visible = true">指定候选人</a-button>-->
-<!--              <a-modal v-model:open="visible" ok-text="添加" cancel-text="取消" @ok="onOkStep2"-->
-<!--                       class="candidate-modal"-->
-<!--                       :style="{ top: '50%', transform: 'translateY(-50%)' }">-->
-<!--                <a-form :model="formState" name="form_in_modal" :rules="rulesId" ref="candidateFormRef">-->
-<!--                  <a-form-item name="candidateid" label="候选人ID">-->
-<!--                    <a-select v-model:value="formState.candidateid" placeholder="请选择候选人" class="candidate-select">-->
-<!--                      <a-select-option v-for="item in candidateData.list" :key="item.ID" :value="item.ID">-->
-<!--                        {{ item.ID }} - {{ item.Name }}-->
-<!--                      </a-select-option>-->
-<!--                    </a-select>-->
-<!--                  </a-form-item>-->
-<!--                </a-form>-->
-<!--              </a-modal>-->
 <!--            </a-space>-->
-<!--            <a-divider></a-divider>-->
-<!--            <a-list-->
-<!--              v-if="candidateData.list"-->
-<!--              :grid="{ xs: 1, sm: 2, md: 2, lg: 3, xl: 3, xxl: 4 }"-->
-<!--              item-layout="vertical"-->
-<!--              size="middle"-->
-<!--              :data-source="paginatedData"-->
-<!--              :pagination="pagination"-->
-<!--            >-->
-<!--              <template #renderItem="{ item }">-->
-<!--                <a-list-item :key="item.ID">-->
-<!--                  <a-card :title="`ID&emsp;${item.ID}`" :class="{'highlighted-card': item.ID === vote.candidateid}">-->
-<!--                    <template #actions>-->
-<!--                      <router-link :to="{ name: 'editcandidate', params: { id: item.ID }}">-->
-<!--                        <EditOutlined />&emsp;<span class="edit-text">修改信息</span>-->
-<!--                      </router-link>-->
-<!--                    </template>-->
-<!--                    <a-list-item-meta>-->
-<!--                      <template #title>-->
-<!--                        <a>{{ item.Name }}</a>-->
-<!--                      </template>-->
-<!--                      <template #avatar>-->
-<!--                        <a-avatar v-if="candidateData" :src="`data:image/png;base64,${item.Photo}`" />-->
-<!--                      </template>-->
-<!--                    </a-list-item-meta>-->
-<!--                    {{ item.Detail }}-->
-<!--                  </a-card>-->
-<!--                </a-list-item>-->
-<!--              </template>-->
-<!--            </a-list>-->
-<!--          </div>-->
-          <div class="candidate-list-container">
-            <a-space>
-              <a-button size="large" @click="$router.replace({name:'addcandidate'})">
-                <PlusOutlined /> 新增候选人
-              </a-button>
-            </a-space>
             <a-divider></a-divider>
             <a-list
               v-if="candidateData.list"
@@ -164,7 +112,7 @@
                 <a-list-item :key="item.ID">
                   <a-card
                     :title="`ID&emsp;${item.ID}`"
-                    :class="{'highlighted-card': item.ID === vote.candidateid}"
+                    :class="{'highlighted-card': vote.candidateid.includes(item.ID)}"
                     @click="toggleCandidateSelection(item.ID)"
                     style="cursor: pointer;"
                   >
@@ -191,27 +139,86 @@
 
         <!-- 第3步内容：完成 -->
         <template v-if="currentStep === 2">
-          <a-table :dataSource="stepData" :columns="columns" bordered :pagination="false">
-            <template #action="{ record }">
-              <div v-if="record.key === '1'">
-                <a-button
-                  type="primary"
-                  :disabled="!isStepOneValid || voteCreated"
-                  @click="onFinish(vote)"
-                >
-                  创建投票
-                </a-button>
-              </div>
-              <div v-else-if="record.key === '2'">
-                <a-button
-                  type="primary"
-                  :disabled="!isStepTwoValid || !voteCreated || candidateConfirmed"
-                  @click="onOk"
-                >
-                  确认候选人
-                </a-button>
+          <a-table :dataSource="stepData" :columns="columns" bordered :pagination="false" style="width: 1000px; margin: 0 auto;"> <!-- 居中表格 -->
+
+            <!-- 步骤列 -->
+            <template #step="{ record }">
+              <div style="font-weight: bold; font-size: 21px;">
+                <div v-if="record.key === '1'">
+                  基本信息
+                  <div style="font-style: italic; color: gray; font-size: 14px;">
+                    包括投票名称、投票截至时间以及每个投票者的可投票数。
+                  </div>
+                </div>
+                <div v-else-if="record.key === '2'">
+                  候选人
+                  <div style="font-style: italic; color: gray; font-size: 14px;">
+                    参与投票的被投票者(候选人)ID。
+                  </div>
+                </div>
               </div>
             </template>
+
+            <!-- 状态列 -->
+            <template #status="{ record }">
+              <div style="font-size: 18px; display: flex; justify-content: space-between;">
+                <div v-if="record.key === '1'" style="flex-grow: 1;">
+                  <div style="margin-top: 8px; display: flex; justify-content: space-between;">
+                    <span>投票名：{{ vote.name }}</span>
+                    <CheckCircleFilled v-if="vote.name" style="color: green; font-size: 24px; margin-right: 30px;" />
+                    <CloseCircleFilled v-else style="color: red; font-size: 24px; margin-right: 30px;" />
+                  </div>
+                  <div style="display: flex; justify-content: space-between;">
+                    <span>截至时间：{{ vote.deadline }}</span>
+                    <CheckCircleFilled v-if="vote.deadline" style="color: green; font-size: 24px; margin-right: 30px;" />
+                    <CloseCircleFilled v-else style="color: red; font-size: 24px; margin-right: 30px;" />
+                  </div>
+                  <div style="display: flex; justify-content: space-between;">
+                    <span>可投票数：{{ vote.num }}</span>
+                    <CheckCircleFilled v-if="vote.num >= 1 && vote.num <= 10" style="color: green; font-size: 24px; margin-right: 30px;" />
+                    <CloseCircleFilled v-else style="color: red; font-size: 24px; margin-right: 30px;" />
+                  </div>
+                </div>
+
+                <div v-else-if="record.key === '2'" style="flex-grow: 1;">
+                  <div v-if="vote.candidateid && vote.candidateid.length > 0">
+                    <div v-for="id in vote.candidateid" :key="id" style="margin-top: 8px; display: flex; justify-content: space-between;">
+                      <span>候选人ID：{{ id }}</span>
+                      <CheckCircleFilled style="color: green; font-size: 24px; margin-right: 30px;" />
+                    </div>
+                  </div>
+                  <div v-else style="margin-top: 8px; display: flex; justify-content: space-between;">
+                    <span>没有候选人</span>
+                    <CloseCircleFilled style="color: red; font-size: 24px; margin-right: 30px;" />
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <!-- 操作列 -->
+            <template #action="{ record }">
+              <div style="text-align: center;">
+                <div v-if="record.key === '1'">
+                  <a-button
+                    type="primary"
+                    :disabled="!isStepOneValid || voteCreated"
+                    @click="onFinish(vote)"
+                  >
+                    创建投票
+                  </a-button>
+                </div>
+                <div v-else-if="record.key === '2'">
+                  <a-button
+                    type="primary"
+                    :disabled="!isStepTwoValid || !voteCreated || candidateConfirmed"
+                    @click="onOk"
+                  >
+                    确认候选人
+                  </a-button>
+                </div>
+              </div>
+            </template>
+
           </a-table>
         </template>
 
@@ -221,8 +228,17 @@
             <!-- 投票链接 -->
             <a-card title="投票链接 (分享给投票人)" style="margin-bottom: 20px;">
               <div class="voting-link-section">
-                <!-- 左侧虚拟URL链接 -->
-                <div class="voting-link">
+
+                <!-- 投票活动描述行 -->
+<!--                <div class="voting-description" style="margin-bottom: 10px; display: block;"> &lt;!&ndash; 确保独占一行 &ndash;&gt;-->
+<!--                  <p style="font-weight: bold;">-->
+<!--                    &lt;!&ndash; 检查描述是否为空，若为空则显示默认文本 &ndash;&gt;-->
+<!--                    投票活动描述：{{ vote.description ? vote.description : '未填写描述的投票' }}-->
+<!--                  </p>-->
+<!--                </div>-->
+
+                <!-- 左侧虚拟URL链接行 -->
+                <div class="voting-link" style="display: block;"> <!-- 确保独占一行 -->
                   <div class="link-item">
                     <p style="font-weight: bold;">参与投票：“{{ vote.name }}”</p>
                     <div class="link-wrapper">
@@ -232,23 +248,16 @@
                       <a-button type="link" @click="copyToClipboard('https://vote.example.com/m/12345/abcde')">复制</a-button>
                     </div>
                   </div>
-                  <div class="link-item">
-                    <p style="font-weight: bold;">参与投票：“{{ vote.name }}”</p>
-                    <div class="link-wrapper">
-                      <a href="https://vote.cn/m/12345/abcde" target="_blank" class="styled-link">
-                        https://vote.cn/m/12345/abcde
-                      </a>
-                      <a-button type="link" @click="copyToClipboard('https://vote.cn/m/12345/abcde')">复制</a-button>
-                    </div>
-                  </div>
                 </div>
+
                 <!-- 右侧微信二维码 -->
                 <div class="qrcode-section">
+                  <p style="font-weight: bold;">扫码微信投票</p>
                   <img src="@/assets/qrcode.svg" alt="微信二维码" class="qrcode-img"/>
-                  <p>扫码微信投票</p>
                 </div>
               </div>
             </a-card>
+
           </div>
         </template>
       </a-form>
@@ -277,7 +286,7 @@ import voteService from '@/service/voteService';
 import dayjs from 'dayjs';
 import { message } from 'ant-design-vue';
 import { candidateData } from '@/data/candidatedata';
-import { EditOutlined, PlusOutlined } from '@ant-design/icons-vue';
+import { EditOutlined, CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons-vue';
 import participateService from '@/service/participateService';
 
 const vote = reactive({
@@ -286,11 +295,11 @@ const vote = reactive({
   deadline: '',
   openTimeOption: 'pause', // 默认选择立刻打开投票
   scheduledOpenTime: '', // 定时开放时间
-  primaryContact: '',
+  description: '',
   voteType: 'test',
-  resultsViewing: 'adminAnytime',
+  resultsViewing: 'adminAfterEnd',
   voteid: 0,
-  candidateid: 0,
+  candidateid: [], // 用数组存储候选人ID
 });
 
 const steps = [
@@ -329,9 +338,14 @@ const validateDDL = async (_rule, value) => {
   if (value === '') {
     return Promise.reject(new Error('请选择截止时间'));
   }
-  if (dayjs().isAfter(dayjs(value))) {
-    return Promise.reject(new Error('投票时间不能早于当前时间'));
+  const currentTime = dayjs();
+  const selectedTime = dayjs(value);
+
+  // 判断是否早于当前时间 + 15分钟
+  if (currentTime.add(15, 'minute').isAfter(selectedTime)) {
+    return Promise.reject(new Error('投票时间至少要比当前时间晚15分钟'));
   }
+
   return Promise.resolve();
 };
 
@@ -384,8 +398,16 @@ const onFinishFailed = (errors) => {
   console.log(errors);
 };
 const disabledDate = (current) => {
-  return current < dayjs().endOf('day');
+  // 获取当前时间，并加上15分钟
+  const minSelectableTime = dayjs().add(1, 'minute');
+
+  // 判断选择的时间是否在当前时间的15分钟之前
+  return current && current < minSelectableTime;
 };
+
+// const disabledDate = (current) => {
+//   return current < dayjs().endOf('day');
+// };
 const copyToClipboard = (text) => {
   navigator.clipboard.writeText(text).then(() => {
     message.success('链接已复制到剪贴板');
@@ -400,12 +422,13 @@ const copyToClipboard = (text) => {
 //   candidateid: [{ required: true, message: '请选择候选人', trigger: 'change' }],
 // };
 const toggleCandidateSelection = (id) => {
-  if (vote.candidateid === id) {
-    // 如果当前候选人已经被选择，则取消选择
-    vote.candidateid = null;
+  const index = vote.candidateid.indexOf(id);
+  if (index > -1) {
+    // 如果候选人已经被选中，则取消选择
+    vote.candidateid.splice(index, 1);
   } else {
-    // 选择候选人
-    vote.candidateid = id;
+    // 如果未被选中，则添加到数组中
+    vote.candidateid.push(id);
   }
 };
 const pagination = ref({
@@ -485,7 +508,7 @@ const isStepOneValid = computed(() => {
 });
 
 const isStepTwoValid = computed(() => {
-  return vote.candidateid > 0; // 假设至少需要选择一个候选人
+  return vote.candidateid.length > 0; // 假设至少需要选择一个候选人
 });
 
 const finishAndRedirect = () => {
@@ -506,17 +529,27 @@ const stepData = [
   },
 ];
 
+// 列定义
 const columns = [
   {
     title: '步骤',
     dataIndex: 'step',
     key: 'step',
+    slots: { customRender: 'step' },
+    width: 350,
+  },
+  {
+    title: '状态',
+    dataIndex: 'status',
+    key: 'status',
+    slots: { customRender: 'status' },
   },
   {
     title: '操作',
     dataIndex: 'action',
     key: 'action',
-    slots: { customRender: 'action' }, // 使用Vue3的插槽定义
+    slots: { customRender: 'action' },
+    width: 150,
   },
 ];
 
@@ -615,7 +648,8 @@ const columns = [
 }
 
 .share-content-container {
-  width: 100%;
+  width: 1000px;
+  margin: auto;
   display: flex;
   flex-direction: column;
   gap: 20px;
