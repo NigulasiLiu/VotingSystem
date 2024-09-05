@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <a-card title="新的候选人" style="text-align:center; width:25rem">
+    <a-card title="添加新的候选人" style="text-align:center; width:25rem">
       <a-form :model="candidate" name="basic" :rules="rules" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }"
         autocomplete="off" @finish="onFinish" @finishFailed="onFinishFailed">
         <a-form-item label="姓名" name="name">

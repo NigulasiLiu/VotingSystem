@@ -280,7 +280,6 @@ import { candidateData } from '@/data/candidatedata';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons-vue';
 import participateService from '@/service/participateService';
 
-// 转换为本地时区
 const vote = reactive({
   name: '',
   num: 0,
@@ -293,6 +292,7 @@ const vote = reactive({
   voteid: 0,
   candidateid: 0,
 });
+
 const steps = [
   { title: '基本信息' },
   { title: '候选人' },
