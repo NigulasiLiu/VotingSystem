@@ -275,13 +275,11 @@ import {
 } from 'vue';
 import voteService from '@/service/voteService';
 import dayjs from 'dayjs';
-import timezone from 'dayjs/plugin/timezone';
 import { message } from 'ant-design-vue';
 import { candidateData } from '@/data/candidatedata';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons-vue';
 import participateService from '@/service/participateService';
 
-dayjs.extend(timezone);
 // 转换为本地时区
 const vote = reactive({
   name: '',
@@ -295,9 +293,6 @@ const vote = reactive({
   voteid: 0,
   candidateid: 0,
 });
-// 转换为本地时区
-const localTime = dayjs.utc(vote.deadline).tz('Asia/Shanghai').format('YYYY-MM-DD HH:mm:ss');
-console.log(localTime);
 const steps = [
   { title: '基本信息' },
   { title: '候选人' },
