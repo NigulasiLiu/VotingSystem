@@ -47,7 +47,7 @@ import { EditOutlined, ArrowLeftOutlined, PlusOutlined } from '@ant-design/icons
 
 <style scoped>
 .container {
-  margin: 0px auto; /* 调整上边距 */
+  margin: 50px auto; /* 调整上边距 */
     max-width: 1350px;
     padding: 0 20px;
 }

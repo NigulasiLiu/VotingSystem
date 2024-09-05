@@ -105,7 +105,7 @@ export default defineComponent({
 
 <style scoped>
 .container {
-  margin: -50px auto;
+  margin: 0px auto;
   display: flex;
   justify-content: center;
   align-items: center;

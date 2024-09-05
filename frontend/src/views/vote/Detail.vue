@@ -12,7 +12,7 @@
         :deadline="item.deadline" />
       <ComputeVote :voteid="parseInt(itemId,10)" :state="item.state" v-if="userInfo && userInfo.role===1" />
     </a-space>
-    <a-divider></a-divider>
+    <a-divider  class="small-margin-divider"></a-divider>
     <a-space direction="vertical">
       <a-card>
         <a-descriptions :column="2">
@@ -24,10 +24,10 @@
       </a-card>
       <a-divider>候选人列表</a-divider>
       <a-list v-if="participateData.list" :grid="{ xs: 1, sm: 2, md: 2, lg: 3, xl: 3, xxl: 4 }" item-layout="vertical"
-        size="large" :data-source="participateData.list">
+              size="large" :data-source="participateData.list">
         <template #renderItem="{ item }">
           <a-list-item :key="item.ID">
-            <a-card :title="`ID&emsp;${item.ID}`">
+            <a-card :title="`ID&emsp;${item.ID}`" class="equal-card">
               <template #actions>
                 <span>投票结果：{{ item.Out }}</span>
               </template>
@@ -134,8 +134,20 @@ export default {
 
 <style scoped>
 .container {
-  margin: 50px auto; /* 调整上边距 */
+  margin: 30px auto ; /* 调整上边距 */
   max-width: 1350px;
   padding: 0 20px;
+}
+
+.small-margin-divider {
+  margin-top: -5px;
+}
+
+.equal-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 250px; /* 根据需要调整最小高度 */
+  max-height: 400px; /* 根据需要调整最大高度 */
 }
 </style>
