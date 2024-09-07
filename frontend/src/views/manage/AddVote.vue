@@ -457,38 +457,35 @@ const paginatedData = ref(
 //       message.error('请正确选择候选人');
 //     });
 // };
-
 const onOk = () => {
-  participateService
-    .addparticipation({ voteid: vote.voteid, candidateid: vote.candidateid })
+  // 获取候选人 ID 数组
+  const candidateIdsArray = vote.candidateid;
+
+  // 如果候选人数组为空，给出提示
+  if (candidateIdsArray.length === 0) {
+    message.error('请至少选择一个候选人');
+    return;
+  }
+
+  // 使用 Promise.all 发送多个请求，每个请求包含一个候选人 ID
+  const requests = candidateIdsArray.map((candidateId) => {
+    return participateService.addparticipation({
+      voteid: vote.voteid,
+      candidateid: candidateId, // 传入单个候选人 ID
+    });
+  });
+
+  // 处理所有请求的结果
+  Promise.all(requests)
     .then(() => {
-      message.success(`候选人${vote.candidateid}已确认`);
+      message.success(`候选人 ${candidateIdsArray.join(', ')} 已确认`);
       candidateConfirmed.value = true;
     })
     .catch((err) => {
-      message.error(err.response.data.msg);
+      message.error(err.response.data.msg || '确认候选人时出错');
     });
 };
-// const onOk = (values) => {
-//   formRef.value
-//     .validateFields()
-//     .then(() => {
-//       participateService
-//         .addparticipation({ voteid: vote.voteid, candidateid: values.candidateid })
-//         .then(() => {
-//           visible.value = false;
-//           message.success('候选人已确认');
-//           // 如果需要，可以在这里添加页面刷新或者跳转逻辑
-//         })
-//         .catch((err) => {
-//           message.error(err.response.data.msg);
-//         });
-//     })
-//     .catch(() => {
-//       message.error('请正确选择候选人');
-//     });
-// };
-// 确保分页数据正确更新
+
 watch(
   () => pagination.value.current,
   (newVal) => {

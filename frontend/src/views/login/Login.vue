@@ -77,8 +77,11 @@ const loginrules = {
 
 const onFinish = (values) => {
   store.dispatch('userModule/login', { telephone: values.tel, password: values.pass }).then(() => {
-    message.success('登录成功');
     router.push({ path: '/' });
+    setTimeout(() => {
+      window.location.reload();
+      message.success('登录成功');
+    }, 100);// 可以根据需要调整时间
   }).catch((err) => {
     message.error(err.response.data.msg);
   });

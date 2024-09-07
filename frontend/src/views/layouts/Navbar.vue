@@ -1,6 +1,6 @@
 <template>
   <a-layout-header class="header">
-    <a-button class="logo" @click="$router.replace({ name: 'home' })">
+    <a-button class="logo" @click="handleBackToDashboard">
       <img src="@/assets/election.png" alt="Logo" class="logo-image" />
       在线投票
     </a-button>
@@ -34,11 +34,21 @@ export default {
     async handleLogout() {
       try {
         await this.logout(); // 确保登出操作完成
-        message.success('已退出');
         this.$router.replace({ name: 'home' }); // 使用路由导航进行页面跳转
+        setTimeout(() => {
+          window.location.reload();
+          message.success('已退出');
+        }, 100);// 可以根据需要调整时间
       } catch (error) {
         message.error('退出失败，请重试');
       }
+    },
+
+    handleBackToDashboard() {
+      this.$router.replace({ name: 'home' });
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);// 可以根据需要调整时间
     },
   },
 };

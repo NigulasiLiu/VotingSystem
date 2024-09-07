@@ -20,8 +20,8 @@ func AddCandidate(ctx *gin.Context) {
 	detail := requestClass.Detail
 
 	// 数据验证
-	if len(name) > 10 {
-		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "名字不超过10位")
+	if len(name) > 20 {
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "名字不超过20位")
 		return
 	}
 	db := common.GetDB()
