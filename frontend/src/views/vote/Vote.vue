@@ -1,8 +1,8 @@
 <template>
   <div class="container" v-if="item">
     <a-space>
-      <AddParticipate :voteid="parseInt(itemId, 10)" :state="item.state" />
-      <OpenVote :voteid="parseInt(itemId, 10)" :state="item.state" />
+<!--      <AddParticipate :voteid="parseInt(itemId, 10)" :state="item.state" />-->
+<!--      <OpenVote :voteid="parseInt(itemId, 10)" :state="item.state" />-->
       <SelectVoted :voteid="parseInt(itemId, 10)" :state="item.state" :n="item.count" :num="item.num" :options="options"
                    :deadline="item.deadline" />
       <ComputeVote :voteid="parseInt(itemId, 10)" :state="item.state" />
@@ -24,7 +24,7 @@
           <a-list-item :key="item.ID">
             <a-card :title="`ID&emsp;${item.ID}`" class="equal-card">
               <template #actions>
-                <span>投票结果：{{ item.Out }}</span>
+                <span>投票结果：{{ item.Out ? item.Out : '进行中' }}</span>
               </template>
               <a-list-item-meta>
                 <template #title>
@@ -49,9 +49,7 @@ import participateService from '@/service/participateService';
 import { message } from 'ant-design-vue';
 import { mapState } from 'vuex';
 import { reactive } from 'vue';
-import AddParticipate from '@/views/vote/AddParticipate.vue';
 import SelectVoted from '@/views/vote/SelectVoted.vue';
-import OpenVote from '@/views/vote/OpenVote.vue';
 import ComputeVote from './ComputeVote.vue';
 
 export default {
@@ -65,9 +63,7 @@ export default {
     };
   },
   components: {
-    AddParticipate,
     SelectVoted,
-    OpenVote,
     ComputeVote,
   },
   data() {
@@ -134,7 +130,7 @@ export default {
 }
 
 .small-margin-divider {
-  margin-top: -5px;
+  margin-top: 15px;
 }
 
 .equal-card {

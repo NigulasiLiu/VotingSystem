@@ -1,5 +1,5 @@
 <template>
-  <a-button type="primary" @click="visible = true" v-if="state === 1 && !isEnd">投票</a-button>
+  <a-button type="primary" @click="visible = true" v-if="!isEnd">投票</a-button>
   <a-modal v-model:visible="visible" ok-text="投票" cancel-text="取消" @ok="onOk">
     <a-select v-model:value="value" style="width: 80%" :options="options"></a-select>
   </a-modal>
@@ -62,7 +62,7 @@ export default defineComponent({
         });
     },
     onOk() {
-      votedService.addvoted({ voteid: this.voteid, voteKey: this.userInfo.voteKey })
+      votedService.addvoted({ voteid: this.voteid, voteKey: this.voteKey })
         .then(() => {
           this.visible = false;
           // 显示投票成功的消息

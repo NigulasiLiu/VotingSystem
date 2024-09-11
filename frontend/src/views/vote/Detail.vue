@@ -4,12 +4,12 @@
       <a-button type="link" @click="goBack">
         <ArrowLeftOutlined />返回投票列表页
       </a-button>
-<!--      <AddParticipate :voteid="parseInt(itemId,10)" :state="item.state" v-if="userInfo && userInfo.role===1" />-->
-<!--      <OpenVote :voteid="parseInt(itemId,10)" :state="item.state" v-if="userInfo && userInfo.role===1" />-->
+      <AddParticipate :voteid="parseInt(itemId,10)" :state="item.state" v-if="userInfo && userInfo.role===1" />
+      <OpenVote :voteid="parseInt(itemId,10)" :state="item.state" v-if="userInfo && userInfo.role===1" />
       <EndVote :voteid="parseInt(itemId,10)" :state="item.state" :deadline="item.deadline"
         v-if="userInfo && userInfo.role===1" />
-      <SelectVoted :voteid="parseInt(itemId,10)" :state="item.state" :n="item.count" :num="item.num" :options="options"
-        :deadline="item.deadline" />
+<!--      <SelectVoted :voteid="parseInt(itemId,10)" :state="item.state" :n="item.count" :num="item.num" :options="options"-->
+<!--        :deadline="item.deadline" />-->
       <ComputeVote :voteid="parseInt(itemId,10)" :state="item.state" v-if="userInfo && userInfo.role===1" />
     </a-space>
     <a-divider :voteid="parseInt(itemId,10)" :state="item.state" v-if="userInfo && userInfo.role===1"  class="small-margin-divider"></a-divider>
@@ -33,7 +33,7 @@
                     <span v-if="index === 0 && item.Out" class="gold-medal">🥇</span>
                     <span v-else-if="index === 1 && item.Out" class="silver-medal">🥈</span>
                     <span v-else-if="index === 2 && item.Out" class="bronze-medal">🥉</span>
-                    投票结果：{{ item.Out }}
+                    投票结果：{{ item.Out ? item.Out : '进行中' }}
                   </span>
                 </template>
                 <a-list-item-meta>
@@ -61,7 +61,6 @@ import { ArrowLeftOutlined } from '@ant-design/icons-vue';
 import { mapState } from 'vuex';
 import { reactive } from 'vue';
 import AddParticipate from '@/views/vote/AddParticipate.vue';
-import SelectVoted from '@/views/vote/SelectVoted.vue';
 import OpenVote from '@/views/vote/OpenVote.vue';
 import EndVote from './EndVote.vue';
 import ComputeVote from './ComputeVote.vue';
@@ -78,7 +77,6 @@ export default {
   },
   components: {
     AddParticipate,
-    SelectVoted,
     ArrowLeftOutlined,
     OpenVote,
     EndVote,

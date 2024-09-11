@@ -82,7 +82,15 @@ export default {
     }),
     // 过滤voteData.list，排除掉deletedIds中的ID
     filteredVoteData() {
-      return this.voteData.list.filter((item) => !this.deletedIds.includes(item.ID));
+      // 确保 voteData.list 和 deletedIds 都是有效的数组
+      const voteList = Array.isArray(this.voteData?.list) ? this.voteData.list : [];
+      const deletedIds = Array.isArray(this.deletedIds) ? this.deletedIds : [];
+
+      // 使用 filter 进行过滤，确保 ID 存在并可比较
+      return voteList.filter((item) => {
+        // 确保 item.ID 存在，避免 undefined 比较
+        return item?.ID !== undefined && !deletedIds.includes(item.ID);
+      });
     },
   },
   methods: {

@@ -51,8 +51,8 @@
             <div class="form-right">
               <a-form-item label="开放时间" name="openTime">
                 <a-radio-group v-model:value="vote.openTimeOption">
-                  <a-radio value="pause">暂不开放投票</a-radio>
                   <a-radio value="immediate">立刻开放投票</a-radio>
+                  <a-radio value="pause">暂不开放投票</a-radio>
                   <a-radio value="scheduled">
                     定时释放：
                     <a-date-picker
@@ -419,7 +419,7 @@ const vote = reactive({
   name: '',
   num: 0,
   deadline: '',
-  openTimeOption: 'pause', // 默认选择立刻打开投票
+  openTimeOption: 'immediate', // 默认选择立刻打开投票
   scheduledOpenTime: '', // 定时开放时间
   description: '',
   voteType: 'test',
@@ -695,11 +695,6 @@ const isEmailValid = (email) => {
   return emailRegex.test(email);
 };
 
-// const finishAndRedirect = () => {
-//   if (voteCreated.value && candidateConfirmed.value) {
-//     window.location.href = '/votinglist';
-//   }
-// };
 const finishAndRedirect = () => {
   // 检查投票是否已创建，并确认候选人
   if (voteCreated.value && candidateConfirmed.value) {
