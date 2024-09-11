@@ -43,9 +43,20 @@ const routes = [
     component: () => import('../views/vote/Detail.vue'),
   },
   {
+    path: '/ballot',
+    name: 'ballot',
+    component: () => import('../views/vote/Ballot.vue'),
+  },
+  {
     path: '/candidate/:id',
     name: 'editcandidate',
     component: () => import('../views/manage/EditCandidate.vue'),
+  },
+  {
+    path: '/vote/:key',
+    name: 'vote',
+    component: () => import('../views/vote/Vote.vue'), // 引入你的投票页面组件
+    // props: true, // 允许路由参数作为 props 传递到组件
   },
 ];
 

@@ -4,16 +4,16 @@
       <a-button type="link" @click="goBack">
         <ArrowLeftOutlined />返回投票列表页
       </a-button>
-      <AddParticipate :voteid="parseInt(itemId,10)" :state="item.state" v-if="userInfo && userInfo.role===1" />
-      <OpenVote :voteid="parseInt(itemId,10)" :state="item.state" v-if="userInfo && userInfo.role===1" />
+<!--      <AddParticipate :voteid="parseInt(itemId,10)" :state="item.state" v-if="userInfo && userInfo.role===1" />-->
+<!--      <OpenVote :voteid="parseInt(itemId,10)" :state="item.state" v-if="userInfo && userInfo.role===1" />-->
       <EndVote :voteid="parseInt(itemId,10)" :state="item.state" :deadline="item.deadline"
         v-if="userInfo && userInfo.role===1" />
       <SelectVoted :voteid="parseInt(itemId,10)" :state="item.state" :n="item.count" :num="item.num" :options="options"
         :deadline="item.deadline" />
       <ComputeVote :voteid="parseInt(itemId,10)" :state="item.state" v-if="userInfo && userInfo.role===1" />
     </a-space>
-    <a-divider  class="small-margin-divider"></a-divider>
-    <a-space direction="vertical">
+    <a-divider :voteid="parseInt(itemId,10)" :state="item.state" v-if="userInfo && userInfo.role===1"  class="small-margin-divider"></a-divider>
+    <a-space direction="vertical" class="card-space">
       <a-card>
         <a-descriptions :column="2">
           <a-descriptions-item label="投票名称">{{ item.name }}</a-descriptions-item>
@@ -23,27 +23,32 @@
         </a-descriptions>
       </a-card>
       <a-divider>候选人列表</a-divider>
-      <a-list v-if="participateData.list" :grid="{ xs: 1, sm: 2, md: 2, lg: 3, xl: 3, xxl: 4 }" item-layout="vertical"
-              size="large" :data-source="participateData.list">
-        <template #renderItem="{ item }">
-          <a-list-item :key="item.ID">
-            <a-card :title="`ID&emsp;${item.ID}`" class="equal-card">
-              <template #actions>
-                <span>投票结果：{{ item.Out }}</span>
-              </template>
-              <a-list-item-meta>
-                <template #title>
-                  <a>{{ item.Name }}</a>
+        <a-list v-if="participateData.list" :grid="{ xs: 1, sm: 2, md: 2, lg: 3, xl: 3, xxl: 4 }" item-layout="vertical"
+                size="large" :data-source="sortedList">
+          <template #renderItem="{ item, index }">
+            <a-list-item :key="item.ID">
+              <a-card :title="`ID&emsp;${item.ID}`" class="equal-card">
+                <template #actions>
+                  <span class="getResultClass(index)">
+                    <span v-if="index === 0 && item.Out" class="gold-medal">🥇</span>
+                    <span v-else-if="index === 1 && item.Out" class="silver-medal">🥈</span>
+                    <span v-else-if="index === 2 && item.Out" class="bronze-medal">🥉</span>
+                    投票结果：{{ item.Out }}
+                  </span>
                 </template>
-                <template #avatar>
-                  <a-avatar v-if="participateData" :src="`data:image/png;base64,${item.Photo}`" />
-                </template>
-              </a-list-item-meta>
-              {{ item.Detail }}
-            </a-card>
-          </a-list-item>
-        </template>
-      </a-list>
+                <a-list-item-meta>
+                  <template #title>
+                    <a>{{ item.Name }}</a>
+                  </template>
+                  <template #avatar>
+                    <a-avatar v-if="participateData" :src="`data:image/png;base64,${item.Photo}`" />
+                  </template>
+                </a-list-item-meta>
+                {{ item.Detail }}
+              </a-card>
+            </a-list-item>
+          </template>
+        </a-list>
     </a-space>
   </div>
 </template>
@@ -110,6 +115,17 @@ export default {
     goBack() {
       this.$router.go(-1); // 返回上一页
     },
+    // 根据排名返回不同的样式类名
+    getResultClass(index) {
+      if (index === 0) {
+        return 'gold-medal-text';
+      } if (index === 1) {
+        return 'silver-medal-text';
+      } if (index === 2) {
+        return 'bronze-medal-text';
+      }
+      return '';
+    },
   },
   computed: {
     ...mapState({
@@ -128,6 +144,10 @@ export default {
         return (this.participateData.list || []).map((item) => ({ value: item.X, label: `${item.X} ${item.Name}` }));
       },
     }),
+    // 对列表进行排序，Out值从大到小排列
+    sortedList() {
+      return [...this.participateData.list].sort((a, b) => b.Out - a.Out);
+    },
   },
 };
 </script>
@@ -143,11 +163,28 @@ export default {
   margin-top: -5px;
 }
 
+.card-space {
+  margin-top: 15px;
+}
 .equal-card {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   min-height: 250px; /* 根据需要调整最小高度 */
   max-height: 400px; /* 根据需要调整最大高度 */
+}
+.gold-medal-text {
+  font-weight: bold;
+  //color: #ffd700; /* 金色 */
+}
+
+.silver-medal-text {
+  font-weight: bold;
+  //color: #c0c0c0; /* 银色 */
+}
+
+.bronze-medal-text {
+  font-weight: bold;
+  //color: #cd7f32; /* 铜色 */
 }
 </style>

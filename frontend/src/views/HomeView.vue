@@ -7,7 +7,7 @@
       <p class="subtitle">高效的隐私保护</p>
       <h1 class="main-title">在线投票系统</h1>
       <a-button type="primary" size="large" @click="$router.replace({ name: 'votinglist' })">
-        查看选举列表
+        查看投票列表
       </a-button>
     </div>
   </div>

@@ -1,15 +1,15 @@
 <template>
-  <a-layout-header class="header">
+  <a-layout-header class="header" :key="userInfo ? 'user-info-key' : 'no-user-info-key'">
     <a-button class="logo" @click="handleBackToDashboard">
       <img src="@/assets/election.png" alt="Logo" class="logo-image" />
       在线投票
     </a-button>
     <a-menu class="menu" theme="light" mode="horizontal">
-      <a-menu-item key='login' @click="$router.replace({ name: 'login' })" v-if="!userInfo">
+      <a-menu-item key='login' @click="$router.replace({ name: 'login' })" v-if="!userInfo && !isNotSlashPage">
         <user-outlined />
         <span class="login-text">登录</span>
       </a-menu-item>
-      <a-menu-item key='logout' @click="handleLogout" v-if="userInfo">
+      <a-menu-item key='logout' @click="handleLogout" v-if="userInfo && !isBallotPage">
         <user-outlined />
         <span>退出</span>
       </a-menu-item>
@@ -26,14 +26,35 @@ export default {
   components: {
     UserOutlined,
   },
-  computed: mapState({
-    userInfo: (state) => state.userModule.userInfo,
-  }),
+  computed: {
+    ...mapState({
+      userInfo: (state) => state.userModule.userInfo,
+    }),
+    isBallotPage() {
+      return this.$route.path === '/ballot';
+    },
+    isLoginPage() {
+      return this.$route.path === '/login';
+    },
+    isNotSlashPage() {
+      return this.$route.path !== '/';
+    },
+  },
+  /*
+  beforeRouteEnter(to, from, next) {
+    next((vm) => {
+      if (!vm.userInfo) {
+        vm.$router.replace({ name: 'login' });
+      }
+    });
+  },
+  */
   methods: {
     ...mapActions('userModule', ['logout']),
     async handleLogout() {
       try {
         await this.logout(); // 确保登出操作完成
+        message.success('已退出');
         this.$router.replace({ name: 'home' }); // 使用路由导航进行页面跳转
         setTimeout(() => {
           window.location.reload();

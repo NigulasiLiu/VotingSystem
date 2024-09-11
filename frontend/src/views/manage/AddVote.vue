@@ -94,14 +94,9 @@
         <!-- 第2步内容：候选人 -->
         <template v-if="currentStep === 1">
           <div class="candidate-list-container">
-<!--            <a-space>-->
-<!--              <a-button size="large" @click="$router.replace({name:'addcandidate'})">-->
-<!--                <PlusOutlined /> 新增候选人-->
-<!--              </a-button>-->
-<!--            </a-space>-->
             <a-divider></a-divider>
             <a-list
-              v-if="candidateData.list"
+              v-if="candidateData.list.length > 0"
               :grid="{ xs: 1, sm: 2, md: 2, lg: 3, xl: 3, xxl: 4 }"
               item-layout="vertical"
               size="middle"
@@ -136,11 +131,55 @@
             </a-list>
           </div>
         </template>
-
-        <!-- 第3步内容：完成 -->
+        <!-- 第3步：输入投票者数据 -->
         <template v-if="currentStep === 2">
-          <a-table :dataSource="stepData" :columns="columns" bordered :pagination="false" style="width: 1000px; margin: 0 auto;"> <!-- 居中表格 -->
+          <a-form :model="step3Data" name="basic">
+            <div class="table-container">
+              <a-table :dataSource="step3Data" :pagination="false" bordered>
+                <a-table-column title="姓名" key="name">
+                  <template #default="{ record, index }">
+                    <a-form-item :name="'name' + index">
+                      <a-input v-model:value="record.name" placeholder="请输入姓名" />
+                    </a-form-item>
+                  </template>
+                </a-table-column>
+                <a-table-column title="电话" key="phone">
+                  <template #default="{ record, index }">
+                    <a-form-item :name="'phone' + index">
+                      <a-input v-model:value="record.phone" placeholder="请输入电话"/>
+                    </a-form-item>
+                  </template>
+                </a-table-column>
+                <a-table-column title="邮箱" key="email">
+                  <template #default="{ record, index }">
+                    <a-form-item :name="'email' + index">
+                      <a-input v-model:value="record.email" placeholder="请输入邮箱"/>
+                    </a-form-item>
+                  </template>
+                </a-table-column>
+                <a-table-column title="操作" key="action">
+                  <template #default="{ index }">
+                    <a-button type="link" @click="removeVoter(index)" class="delete-button">
+                      <span class="delete-icon">×</span>
+                    </a-button>
+                  </template>
+                </a-table-column>
+              </a-table>
+            </div>
+            <a-button type="dashed" @click="addVoter" style="margin-top: 20px; margin-right: 20px;width: 200px;">
+              <PlusOutlined /> 添加新候选人
+            </a-button>
+            <!-- 存储第三步的数据 -->
+            <a-button type="primary" @click="storeStep3Data" style="margin-top: 20px;">
+              保存
+            </a-button>
+          </a-form>
 
+        </template>
+
+        <!-- 第4步内容：完成 -->
+        <template v-if="currentStep === 3">
+          <a-table :dataSource="stepData" :columns="columns" bordered :pagination="false" style="width: 1000px; margin: 0 auto;"> <!-- 居中表格 -->
             <!-- 步骤列 -->
             <template #step="{ record }">
               <div style="font-weight: bold; font-size: 21px;">
@@ -156,6 +195,12 @@
                     参与投票的被投票者(候选人)ID。
                   </div>
                 </div>
+                <div v-else-if="record.key === '3'">
+                  投票者
+                  <div style="font-style: italic; color: gray; font-size: 14px;">
+                    参与投票的投票者联系方式。
+                  </div>
+                </div>
               </div>
             </template>
 
@@ -163,35 +208,98 @@
             <template #status="{ record }">
               <div style="font-size: 18px; display: flex; justify-content: space-between;">
                 <div v-if="record.key === '1'" style="flex-grow: 1;">
-                  <div style="margin-top: 8px; display: flex; justify-content: space-between;">
-                    <span>投票名：{{ vote.name }}</span>
-                    <CheckCircleFilled v-if="vote.name" style="color: green; font-size: 24px; margin-right: 30px;" />
-                    <CloseCircleFilled v-else style="color: red; font-size: 24px; margin-right: 30px;" />
-                  </div>
-                  <div style="display: flex; justify-content: space-between;">
-                    <span>截至时间：{{ vote.deadline }}</span>
-                    <CheckCircleFilled v-if="vote.deadline" style="color: green; font-size: 24px; margin-right: 30px;" />
-                    <CloseCircleFilled v-else style="color: red; font-size: 24px; margin-right: 30px;" />
-                  </div>
-                  <div style="display: flex; justify-content: space-between;">
-                    <span>可投票数：{{ vote.num }}</span>
-                    <CheckCircleFilled v-if="vote.num >= 1 && vote.num <= 10" style="color: green; font-size: 24px; margin-right: 30px;" />
-                    <CloseCircleFilled v-else style="color: red; font-size: 24px; margin-right: 30px;" />
-                  </div>
+                  <a-list bordered>
+                    <!-- 投票名 -->
+                    <a-list-item>
+                      <a-list-item-meta
+                        title="投票名"
+                        :description="record.name ? '名称：' + record.name : '未设置投票名'"
+                      />
+                      <CheckCircleFilled v-if="record.name" style="color: green; font-size: 24px; margin-right: 30px;" />
+                      <CloseCircleFilled v-else style="color: red; font-size: 24px; margin-right: 30px;" />
+                    </a-list-item>
+
+                    <!-- 截至时间 -->
+                    <a-list-item>
+                      <a-list-item-meta
+                        title="截至时间"
+                        :description="record.deadline ? '时间：' + record.deadline : '未设置截止时间'"
+                      />
+                      <CheckCircleFilled v-if="record.deadline" style="color: green; font-size: 24px; margin-right: 30px;" />
+                      <CloseCircleFilled v-else style="color: red; font-size: 24px; margin-right: 30px;" />
+                    </a-list-item>
+
+                    <!-- 可投票数 -->
+                    <a-list-item>
+                      <a-list-item-meta
+                        title="可投票数"
+                        :description="record.num ? '数量：' + record.num : '未设置可投票数'"
+                      />
+                      <CheckCircleFilled v-if="record.num >= 1 && record.num <= 10" style="color: green; font-size: 24px; margin-right: 30px;" />
+                      <CloseCircleFilled v-else style="color: red; font-size: 24px; margin-right: 30px;" />
+                    </a-list-item>
+                  </a-list>
                 </div>
 
+                <!-- 第二步：显示候选人信息 -->
                 <div v-else-if="record.key === '2'" style="flex-grow: 1;">
-                  <div v-if="vote.candidateid && vote.candidateid.length > 0">
-                    <div v-for="id in vote.candidateid" :key="id" style="margin-top: 8px; display: flex; justify-content: space-between;">
-                      <span>候选人ID：{{ id }}</span>
-                      <CheckCircleFilled style="color: green; font-size: 24px; margin-right: 30px;" />
-                    </div>
+                  <a-list bordered>
+                    <a-list-item>
+                      <a-list-item-meta
+                        title="候选人"
+                        description="参与投票的候选人"
+                      />
+                      <div v-if="record.candidateid && record.candidateid.length > 0">
+                        <div v-for="id in record.candidateid" :key="id" style="display: flex; justify-content: space-between;">
+                          <a-tag color="blue">候选人ID：{{ id }}</a-tag>
+                          <CheckCircleFilled style="color: green; font-size: 24px; margin-right: 30px;" />
+                        </div>
+                      </div>
+                      <div v-else>
+                        <a-tag color="red">没有候选人</a-tag>
+                        <CloseCircleFilled style="color: red; font-size: 24px; margin-right: 30px;" />
+                      </div>
+                    </a-list-item>
+                  </a-list>
+                </div>
+
+                <!-- 显示投票者信息 -->
+                <div v-else-if="record.key === '3'" style="flex-grow: 1;">
+                  <div v-if="record.voters && record.voters.length > 0">
+                    <a-list
+                      :dataSource="record.voters"
+                      bordered
+                      style="width: 100%;"
+                    >
+                      <template #renderItem="{ item }">
+                        <a-list-item>
+                          <a-list-item-meta
+                            :title="item.name"
+                          />
+                          <div>
+                            <a-tag
+                              :color="isPhoneValid(item.phone) ? 'green' : 'red'"
+                              style="margin-right: 8px;"
+                            >
+                              电话：{{ item.phone }}
+                            </a-tag>
+                            <a-tag
+                              :color="isEmailValid(item.email) ? 'green' : 'red'"
+                            >
+                              邮箱：{{ item.email }}
+                            </a-tag>
+                          </div>
+                        </a-list-item>
+                      </template>
+                    </a-list>
+
                   </div>
                   <div v-else style="margin-top: 8px; display: flex; justify-content: space-between;">
-                    <span>没有候选人</span>
+                    <span>未添加投票者或未保存</span>
                     <CloseCircleFilled style="color: red; font-size: 24px; margin-right: 30px;" />
                   </div>
                 </div>
+
               </div>
             </template>
 
@@ -211,9 +319,18 @@
                   <a-button
                     type="primary"
                     :disabled="!isStepTwoValid || !voteCreated || candidateConfirmed"
-                    @click="onOk"
+                    @click="onCandidateOk"
                   >
                     确认候选人
+                  </a-button>
+                </div>
+                <div v-else-if="record.key === '3'">
+                  <a-button
+                    type="primary"
+                    :disabled="!isStepThreeValid || !candidateConfirmed || voterConfirmed"
+                    @click="onVoterOk"
+                  >
+                    确认投票者
                   </a-button>
                 </div>
               </div>
@@ -221,21 +338,12 @@
 
           </a-table>
         </template>
-
-        <!-- 第4步内容：分享 -->
-        <template v-if="currentStep === 3">
+        <!-- 第5步内容：分享 -->
+        <template v-if="currentStep === 4">
           <div class="share-content-container">
             <!-- 投票链接 -->
             <a-card title="投票链接 (分享给投票人)" style="margin-bottom: 20px;">
               <div class="voting-link-section">
-
-                <!-- 投票活动描述行 -->
-<!--                <div class="voting-description" style="margin-bottom: 10px; display: block;"> &lt;!&ndash; 确保独占一行 &ndash;&gt;-->
-<!--                  <p style="font-weight: bold;">-->
-<!--                    &lt;!&ndash; 检查描述是否为空，若为空则显示默认文本 &ndash;&gt;-->
-<!--                    投票活动描述：{{ vote.description ? vote.description : '未填写描述的投票' }}-->
-<!--                  </p>-->
-<!--                </div>-->
 
                 <!-- 左侧虚拟URL链接行 -->
                 <div class="voting-link" style="display: block;"> <!-- 确保独占一行 -->
@@ -267,9 +375,22 @@
         <a-button v-if="currentStep > 0" @click="prev">
           上一步
         </a-button>
-        <a-button v-if="currentStep < steps.length - 1" style="margin-left: 8px" type="primary" @click="next">
+        <!-- 下一步按钮 -->
+        <a-button
+          v-if="currentStep < steps.length - 1"
+          style="margin-left: 8px"
+          type="primary"
+          :disabled="
+      (currentStep === 0 && !isStepOneValid) ||
+      (currentStep === 1 && !isStepTwoValid) ||
+      (currentStep === 2 && !isStepThreeValid)
+    "
+          @click="next"
+        >
           下一步
         </a-button>
+
+        <!-- 完成按钮 -->
         <a-button v-if="currentStep === steps.length - 1" type="primary" @click="finishAndRedirect" style="margin-left: 8px">
           完成
         </a-button>
@@ -286,8 +407,13 @@ import voteService from '@/service/voteService';
 import dayjs from 'dayjs';
 import { message } from 'ant-design-vue';
 import { candidateData } from '@/data/candidatedata';
-import { EditOutlined, CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons-vue';
+import {
+  EditOutlined,
+  CheckCircleFilled,
+  CloseCircleFilled, PlusOutlined,
+} from '@ant-design/icons-vue';
 import participateService from '@/service/participateService';
+import voterService from '@/service/voterService';
 
 const vote = reactive({
   name: '',
@@ -300,11 +426,14 @@ const vote = reactive({
   resultsViewing: 'adminAfterEnd',
   voteid: 0,
   candidateid: [], // 用数组存储候选人ID
+
+  voters: [], // 新增投票者字段
 });
 
 const steps = [
   { title: '基本信息' },
   { title: '候选人' },
+  { title: '投票者' },
   { title: '完成' },
   { title: '分享' },
 ];
@@ -312,6 +441,7 @@ const steps = [
 const currentStep = ref(0);
 const voteCreated = ref(false);
 const candidateConfirmed = ref(false);
+const voterConfirmed = ref(false);
 const next = () => {
   if (currentStep.value < steps.length - 1) {
     currentStep.value += 1;
@@ -405,9 +535,6 @@ const disabledDate = (current) => {
   return current && current < minSelectableTime;
 };
 
-// const disabledDate = (current) => {
-//   return current < dayjs().endOf('day');
-// };
 const copyToClipboard = (text) => {
   navigator.clipboard.writeText(text).then(() => {
     message.success('链接已复制到剪贴板');
@@ -416,11 +543,6 @@ const copyToClipboard = (text) => {
   });
 };
 
-// const visible = ref(false);
-// const formState = reactive({ candidateid: null });
-// const rulesId = {
-//   candidateid: [{ required: true, message: '请选择候选人', trigger: 'change' }],
-// };
 const toggleCandidateSelection = (id) => {
   const index = vote.candidateid.indexOf(id);
   if (index > -1) {
@@ -444,20 +566,7 @@ const paginatedData = ref(
   ),
 );
 
-// const candidateFormRef = ref(null);
-// const onOkStep2 = () => {
-//   candidateFormRef.value
-//     .validate()
-//     .then(() => {
-//       vote.candidateid = formState.candidateid; // 记录candidateid到vote对象中
-//       visible.value = false;
-//       message.success('候选人已指定');
-//     })
-//     .catch(() => {
-//       message.error('请正确选择候选人');
-//     });
-// };
-const onOk = () => {
+const onCandidateOk = () => {
   // 获取候选人 ID 数组
   const candidateIdsArray = vote.candidateid;
 
@@ -466,13 +575,12 @@ const onOk = () => {
     message.error('请至少选择一个候选人');
     return;
   }
-
   // 使用 Promise.all 发送多个请求，每个请求包含一个候选人 ID
   const requests = candidateIdsArray.map((candidateId) => {
-    return participateService.addparticipation({
-      voteid: vote.voteid,
-      candidateid: candidateId, // 传入单个候选人 ID
-    });
+    return Promise.all([
+      participateService.addparticipation({ voteid: vote.voteid, candidateid: candidateId }),
+      participateService.addparticipation0({ voteid: vote.voteid, candidateid: candidateId }),
+    ]);
   });
 
   // 处理所有请求的结果
@@ -483,6 +591,48 @@ const onOk = () => {
     })
     .catch((err) => {
       message.error(err.response.data.msg || '确认候选人时出错');
+    });
+};
+
+const generateKey = () => {
+  // 生成一个16位的随机字符串作为密钥
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let key = '';
+  // eslint-disable-next-line no-plusplus
+  for (let i = 0; i < 16; i++) {
+    key += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return key;
+};
+
+const onVoterOk = () => {
+  // 获取投票者数组
+  const voterArray = vote.voters;
+  // 如果投票者数组为空，给出提示
+  if (voterArray.length === 0) {
+    message.error('请至少添加一个投票者');
+    return;
+  }
+  // 使用 Promise.all 发送多个请求，每个请求包含一个投票者的信息
+  const requests = voterArray.map((voter) => {
+    const secretKey = generateKey();
+    return voterService.addVoter({
+      voteid: vote.voteid,
+      name: voter.name,
+      phone: voter.phone,
+      email: voter.email,
+      key: secretKey,
+    });
+  });
+  // 处理所有请求的结果
+  Promise.all(requests)
+    .then(() => {
+      message.success('所有投票者信息已确认并保存');
+      voterConfirmed.value = true;
+    })
+    .catch((err) => {
+      console.error(err.response.data);
+      message.error(err.response.data.msg || '确认投票者时出错');
     });
 };
 
@@ -507,34 +657,132 @@ const isStepOneValid = computed(() => {
 const isStepTwoValid = computed(() => {
   return vote.candidateid.length > 0; // 假设至少需要选择一个候选人
 });
+const step3Data = reactive([
+  {
+    name: '', phone: '', email: '', phoneValid: true, emailValid: true,
+  }, // 每一行代表一个投票者
+]);
 
+// 添加投票者
+const addVoter = () => {
+  step3Data.push({
+    phone: '', email: '', phoneValid: true, emailValid: true,
+  });
+};
+
+// 删除投票者
+const removeVoter = (index) => {
+  step3Data.splice(index, 1);
+};
+
+// 检查所有投票者信息是否有效
+const isStepThreeValid = computed(() => {
+  // 如果没有任何数据，直接返回 false 禁用下一步按钮
+  if (step3Data.length === 0) return false;
+
+  // 确保所有数据行的验证都通过
+  return step3Data.every((data) => data.phoneValid && data.emailValid);
+});
+const isPhoneValid = (phone) => {
+  // 简单的电话验证，只允许10-15位数字
+  const phoneRegex = /^[0-9]{10,15}$/;
+  return phoneRegex.test(phone);
+};
+
+const isEmailValid = (email) => {
+  // 简单的邮箱验证
+  const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
+  return emailRegex.test(email);
+};
+
+// const finishAndRedirect = () => {
+//   if (voteCreated.value && candidateConfirmed.value) {
+//     window.location.href = '/votinglist';
+//   }
+// };
 const finishAndRedirect = () => {
+  // 检查投票是否已创建，并确认候选人
   if (voteCreated.value && candidateConfirmed.value) {
-    window.location.href = '/votinglist';
+    // 调用开放投票的服务
+    voteService.openvote({ id: vote.voteid })
+      .then(() => {
+        message.success('投票已开放');
+        // 跳转到投票列表页面
+        window.location.href = '/votinglist';
+      })
+      .catch((err) => {
+        // 处理开放投票的错误
+        message.error(err.response.data.msg || '开放投票时出错');
+      });
   }
 };
-const stepData = [
+
+const stepData = computed(() => [
   {
     key: '1',
     step: '基本信息',
+    name: vote.name, // 从 vote 动态获取投票名
+    deadline: vote.deadline, // 从 vote 动态获取截止时间
+    num: vote.num, // 从 vote 动态获取可投票数
     action: isStepOneValid.value ? '创建投票' : '',
   },
   {
     key: '2',
     step: '候选人',
+    candidateid: vote.candidateid, // 从 vote 动态获取候选人ID
     action: isStepTwoValid.value && voteCreated.value ? '确认候选人' : '',
   },
-];
-
-// 列定义
-const columns = [
   {
-    title: '步骤',
-    dataIndex: 'step',
-    key: 'step',
-    slots: { customRender: 'step' },
-    width: 350,
+    key: '3',
+    step: '投票者',
+    voters: vote.voters, // 从 vote 动态获取投票者信息
+    action: isStepThreeValid.value && voterConfirmed.value ? '确认投票者' : '',
   },
+]);
+
+const storeStep3Data = () => {
+  // 将 step3Data 整合到 vote.voters 中
+  vote.voters = [...step3Data];
+  //
+  // // 更新 stepData 中的投票者数据
+  // const step3Index = stepData.value.findIndex((item) => item.key === '3');
+  // if (step3Index !== -1) {
+  //   stepData[step3Index].voters = vote.voters; // 更新 stepData 的 voters
+  // }
+
+  message.success('投票者信息已保存');
+};
+// 列定义
+// const Votercolumns = [
+//   {
+//     title: '联系电话',
+//     dataIndex: 'phone',
+//     key: 'phone',
+//     slots: { customRender: 'phone' },
+//     width: 350,
+//   },
+//   {
+//     title: '邮箱',
+//     dataIndex: 'email',
+//     key: 'email',
+//     slots: { customRender: 'email' },
+//   },
+//   {
+//     title: '操作',
+//     dataIndex: 'action',
+//     key: 'action',
+//     slots: { customRender: 'action' },
+//     width: 150,
+//   },
+// ];
+const columns = [
+  // {
+  //   title: '步骤',
+  //   dataIndex: 'step',
+  //   key: 'step',
+  //   slots: { customRender: 'step' },
+  //   width: 290,
+  // },
   {
     title: '状态',
     dataIndex: 'status',
@@ -549,7 +797,6 @@ const columns = [
     width: 150,
   },
 ];
-
 </script>
 
 <style scoped>
@@ -587,6 +834,7 @@ const columns = [
 .more-info-link:hover {
   text-decoration: underline; /* 鼠标悬停时添加下划线 */
 }
+
 .candidate-modal {
   display: flex;
   align-items: center;
@@ -679,6 +927,7 @@ const columns = [
   width: 120px; /* 根据实际二维码大小调整 */
   height: 120px;
 }
+
 .styled-link {
   font-size: 16px;
   color: #1890ff;
@@ -696,4 +945,9 @@ const columns = [
   margin-bottom: 10px;
 }
 
+.delete-icon {
+  font-size: 24px; /* 设置更大的字体 */
+  color: red; /* 保持红色 */
+  cursor: pointer;
+}
 </style>

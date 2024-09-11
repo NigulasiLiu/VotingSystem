@@ -13,9 +13,15 @@ import (
 func AddVoted(ctx *gin.Context) {
 	// 获取参数
 	voteID, _ := strconv.Atoi(ctx.Params.ByName("voteid"))
-	userID, _ := strconv.Atoi(ctx.Params.ByName("userid"))
+	voteKey, _ := strconv.Atoi(ctx.Params.ByName("votekey"))
 
 	db := common.GetDB()
+	// 验证投票密钥是否存在
+	var voter model.Voter
+	if err := db.Where("`key` = ?", voteKey).First(&voter).Error; err != nil {
+		response.Response(ctx, http.StatusUnauthorized, 401, nil, "无效的投票密钥")
+		return
+	}
 	// 数据验证
 	var vote model.Vote
 	db.First(&vote, voteID)
@@ -37,25 +43,31 @@ func AddVoted(ctx *gin.Context) {
 		return
 	}
 
-	var user model.User
-	db.First(&user, userID)
-	if user.ID == 0 {
-		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "选民不存在")
+	//var user model.User
+	//db.First(&user, userID)
+	//if user.ID == 0 {
+	//	response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "选民不存在")
+	//	return
+	//}
+
+	// 获取当前最大的 voteIndex
+	var maxVoteIndex uint
+	db.Model(&model.Voted{}).Where("vote_id = ? AND vote_key = ?", voteID, voteKey).Select("max(vote_index)").Row().Scan(&maxVoteIndex)
+
+	// 新的 voteIndex
+	newVoteIndex := maxVoteIndex + 1
+
+	// 检查是否超过了投票允许的最大次数
+	if newVoteIndex > uint(vote.Num) {
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "投票次数已达上限, 当前尝试为第 "+strconv.Itoa(int(newVoteIndex))+" 次")
 		return
 	}
 
-	// 检查是否已经存在相同的记录
-	var existingVoted model.Voted
-	db.Where("vote_id = ? AND user_id = ?", voteID, userID).First(&existingVoted)
-	if existingVoted.ID != 0 {
-		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "已参加该投票")
-		return
-	}
-
-	// 创建新投票
+	// 记录该次投票：userid：voteid
 	newVoted := model.Voted{
-		UserID: uint(userID),
-		VoteID: uint(voteID),
+		VoteKey:   uint(voteKey),
+		VoteID:    uint(voteID),
+		VoteIndex: newVoteIndex,
 	}
 
 	db.Create(&newVoted)

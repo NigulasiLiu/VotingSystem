@@ -8,6 +8,8 @@ import (
 
 func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.Use(middleware.CORSMiddleware())
+
+	// 需要登录和认证的路由
 	r.POST("/api/auth/register", controller.Register)
 	r.POST("/api/auth/login", controller.Login)
 	r.GET("/api/auth/info", middleware.AuthMiddleware(), controller.Info)
@@ -22,20 +24,29 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 
 	r.POST("/api/auth/addcandidate", middleware.AuthMiddleware(), controller.AddCandidate)
 	r.POST("/api/auth/photo/:id", controller.PhotoUpdate)
-	r.GET("/api/auth/showcandidate", middleware.AuthMiddleware(), controller.ShowCandidate)
+	r.GET("/api/auth/showcandidate", controller.ShowCandidate)
 	r.POST("/api/auth/candidate/detail/:id", middleware.AuthMiddleware(), controller.UpdateDetail)
 
 	r.POST("/api/auth/participate/:voteid/:candidateid", middleware.AuthMiddleware(), controller.AddParticipation)
 	r.GET("/api/auth/showparticipate/:voteid", controller.ShowParticipate)
 
-	r.POST("/api/auth/vote/:voteid/:userid", middleware.AuthMiddleware(), controller.AddVoted)
+	// 修改为 voteKey，而不是 userid
+	r.POST("/api/auth/vote/:voteid/:votekey", controller.AddVoted)
 
+	// 仍然需要认证的路由
 	r.POST("/api/vote/participate/:voteid/:candidateid", middleware.AuthMiddleware(), controller.Redirect)
 	r.POST("/api/vote/server0/:voteid", middleware.AuthMiddleware(), controller.Redirect)
 	r.POST("/api/compute/server0/:voteid", middleware.AuthMiddleware(), controller.Redirect)
 
 	r.POST("/api/vote/server1/:voteid/:id", middleware.AuthMiddleware(), controller.Redirect1)
 	r.POST("/api/compute/server1/:voteid", middleware.AuthMiddleware(), controller.Redirect1)
+
+	// 添加投票者相关的路由
+	r.POST("/api/auth/addvoter/:voteid", middleware.AuthMiddleware(), controller.AddVoter)
+	r.GET("/api/auth/showVoters/:voteid", controller.ShowVoters)
+
+	// 投票者通过 voteKey 进行验证，而不需要认证 Token
+	r.POST("/api/auth/ballot", controller.Ballot)
 
 	return r
 }

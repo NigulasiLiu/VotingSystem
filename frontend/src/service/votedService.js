@@ -1,10 +1,12 @@
 import request from '@/utils/request';
 
-// 新增投票
-const addvoted = ({ voteid, userid }) => {
-  return request.post(`auth/vote/${voteid}/${userid}`);
+// // 新增voted项
+// const addvoted = ({ voteid, userid }) => {
+//   return request.post(`auth/vote/${voteid}/${userid}`);
+// };
+const addvoted = ({ voteid, voteKey }) => {
+  return request.post(`auth/vote/${voteid}/${voteKey}`); // 使用 voteKey 作为验证
 };
-
 const vote0 = ({ id, k }) => {
   return request.post(`vote/server0/${id}`, k);
 };

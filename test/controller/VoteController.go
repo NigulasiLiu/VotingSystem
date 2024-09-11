@@ -163,17 +163,16 @@ func ComputeVote(ctx *gin.Context) {
 	}
 
 	if vote.State != 2 {
-		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "投票状态错误")
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, fmt.Sprintf("投票状态错误, 当前State为 %d", vote.State))
 		return
 	}
 
-	// 更新投票项的 state 为 true
+	// 更新投票项的 state 为 3,计票中
 	vote.State = 3
 	if err := db.Save(&vote).Error; err != nil {
 		response.Response(ctx, http.StatusInternalServerError, 500, nil, "更新投票状态失败")
 		return
 	}
-
 	response.Success(ctx, nil, "开始计票")
 }
 

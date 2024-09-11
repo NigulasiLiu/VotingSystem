@@ -11,8 +11,6 @@ import (
 var DB *gorm.DB
 
 func InitDB() *gorm.DB {
-	//driverName := viper.GetString("datasource.driverName")
-
 	username := viper.GetString("datasource.username")
 	password := viper.GetString("datasource.password")
 	host := viper.GetString("datasource.host")
@@ -27,15 +25,19 @@ func InitDB() *gorm.DB {
 		port,
 		database,
 		charset)
+
 	db, err := gorm.Open(mysql.Open(args), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database,err: " + err.Error())
 	}
+
+	// 自动迁移所有模型
 	db.AutoMigrate(&model.User{})
 	db.AutoMigrate(&model.Vote{})
 	db.AutoMigrate(&model.Candidate{})
 	db.AutoMigrate(&model.Participate{})
 	db.AutoMigrate(&model.Voted{})
+	db.AutoMigrate(&model.Voter{}) // 新增 Voter 模型
 
 	DB = db
 	return db

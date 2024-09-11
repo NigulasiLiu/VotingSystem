@@ -38,7 +38,6 @@
                 </a-form-item>
               </template>
             </a-table-column>
-            <!-- 删除按钮列 -->
             <a-table-column title="操作" key="action">
               <template #default="{ index }">
                 <a-button type="link" @click="removeCandidate(index)" class="delete-button">
@@ -134,10 +133,12 @@ const onFinish = async () => {
       await Promise.all(photoRequests); // 并行处理所有图片上传
     }
 
-    // 成功处理后显示消息并重定向
-    message.success('所有候选人添加成功');
-    window.location.href = '/manage/candidatelist';
-    window.location.reload();
+    message.success('所有候选人添加成功，3s内跳转到候选人列表');
+
+    setTimeout(() => {
+      window.location.href = '/manage/candidatelist';
+      window.location.reload();
+    }, 3000); // 3000 毫秒等于 3 秒
   } catch (err) {
     message.error(err.response.data.msg || '添加候选人或上传图片失败');
   }

@@ -18,9 +18,16 @@ func Eval(ID int, voteid int, k []byte) {
 	// 计算 eta
 	var eta int64
 	db.Model(&model.Participate{}).Where("vote_id = ?", voteid).Count(&eta)
+	if eta < 1 {
+		log.Printf("无效的 eta 值：%d", eta)
+		return
+	}
 
-	// 计算 n
 	n := int(math.Ceil(math.Log2(float64(eta))))
+	if n < 0 {
+		log.Printf("计算出不合理的 n 值：%d", n)
+		return
+	}
 
 	// 提取 s、t、CW、cs、pos
 	const_s := k[:lambda]

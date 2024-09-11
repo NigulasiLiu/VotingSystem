@@ -4,10 +4,14 @@
       <img src="@/assets/login-image.png" alt="Login Image" class="login-image" />
     </div>
     <div class="form-container">
-      <a-card title="登录" style="text-align: center;width:25rem">
+      <a-card title="发起者登录" style="text-align: center;width:25rem" body-style="{ paddingTop: '12px' }">
+        <div style="margin-top: 0.1rem; margin-bottom: 0.5rem; text-align: center;">
+          <span>需要投票，请访问</span>
+          <a-button type="link" @click="openVotingPage" style="padding-left: 0;">投票页面</a-button>
+        </div>
         <a-form :model="userlogin" name="basic" :rules="loginrules" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }"
-          autocomplete="off" @finish="onFinish" @finishFailed="onFinishFailed">
-          <a-form-item label="手机号" name="tel">
+                autocomplete="off" @finish="onFinish" @finishFailed="onFinishFailed">
+          <a-form-item label="手机号" name="tel" style="margin-bottom: 8px;">
             <a-input v-model:value="userlogin.tel" />
           </a-form-item>
 
@@ -39,6 +43,11 @@ const userlogin = reactive({
   pass: '',
 });
 
+const openVotingPage = () => {
+  const votingUrl = router.resolve({ name: 'ballot' }).href;
+  window.open(votingUrl, '_blank');
+};
+
 const validateTel = async (_rule, value) => {
   if (value === '') {
     return Promise.reject(new Error('请输入手机号'));
@@ -46,7 +55,7 @@ const validateTel = async (_rule, value) => {
   if (value.length !== 11) {
     return Promise.reject(new Error('手机号应为11位'));
   }
-  if (value !== '' && !/^(13[0-9]|14[5|7]|15[0|1|2|3|4|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/.test(value)) {
+  if (value !== '' && !/^(13[0-9]|14[5|7]|15[0|1|2|3|4|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9]|19[0|1|2|3|4|5|6|7|8|9])\d{8}$/.test(value)) {
     return Promise.reject(new Error('手机号格式不正确'));
   }
   return Promise.resolve();
@@ -77,11 +86,8 @@ const loginrules = {
 
 const onFinish = (values) => {
   store.dispatch('userModule/login', { telephone: values.tel, password: values.pass }).then(() => {
+    message.success('登录成功');
     router.push({ path: '/' });
-    setTimeout(() => {
-      window.location.reload();
-      message.success('登录成功');
-    }, 100);// 可以根据需要调整时间
   }).catch((err) => {
     message.error(err.response.data.msg);
   });

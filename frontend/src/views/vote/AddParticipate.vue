@@ -84,8 +84,18 @@ export default defineComponent({
       this.$refs.formRef
         .validateFields()
         .then(() => {
-          // 数据校验通过后执行添加候选人操作
+          // 数据校验通过后,插入加participate表
           participateService.addparticipation({ voteid: this.voteid, candidateid: values.candidateid })
+            .then(() => {
+              this.visible = false;
+              message.success('添加成功');
+              window.location.reload(); // 刷新页面
+            })
+            .catch((err) => {
+              message.error(err.response.data.msg);
+            });
+          // 插入加server/participate表
+          participateService.addparticipation0({ voteid: this.voteid, candidateid: values.candidateid })
             .then(() => {
               this.visible = false;
               message.success('添加成功');

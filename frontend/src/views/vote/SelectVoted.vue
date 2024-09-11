@@ -1,5 +1,5 @@
 <template>
-  <a-button type="primary" @click="visible = true" v-if="state===1 && !isEnd">投票</a-button>
+  <a-button type="primary" @click="visible = true" v-if="state === 1 && !isEnd">投票</a-button>
   <a-modal v-model:visible="visible" ok-text="投票" cancel-text="取消" @ok="onOk">
     <a-select v-model:value="value" style="width: 80%" :options="options"></a-select>
   </a-modal>
@@ -47,25 +47,26 @@ export default defineComponent({
   },
   methods: {
     doDpfGen() {
-      return new Promise((resolve, reject) => {
-        const selectedValue = this.value;
-        dpf.dpfGen(selectedValue, 1, this.n, this.voteid)
-          .then((value) => {
-            if (value) message.success('投票成功');
-            else message.success('投票失败');
-            window.location.reload(); // 刷新页面
-            resolve();
-          })
-          .catch((error) => {
-            console.error('dpf.dpfGen 函数出现错误：', error);
-            reject(error);
-          });
-      });
+      return dpf.dpfGen(this.value, 1, this.n, this.voteid)
+        .then((success) => {
+          if (success) {
+            message.success('投票成功');
+          } else {
+            message.error('投票失败');
+          }
+          window.location.reload(); // 刷新页面
+        })
+        .catch((error) => {
+          console.error('dpf.dpfGen 函数出现错误：', error);
+          message.error('An unexpected error occurred');
+        });
     },
     onOk() {
-      votedService.addvoted({ voteid: this.voteid, userid: this.userInfo.id })
+      votedService.addvoted({ voteid: this.voteid, voteKey: this.userInfo.voteKey })
         .then(() => {
           this.visible = false;
+          // 显示投票成功的消息
+          message.info('进入dpfGen');
           return this.doDpfGen();
         })
         .catch((err) => {
@@ -79,11 +80,11 @@ export default defineComponent({
   computed: {
     ...mapState({
       userInfo: (state) => state.userModule.userInfo,
+      voteKey: (state) => state.userModule.voteKey, // 从 vuex 获取 voteKey
       isEnd() {
         const now = new Date();
         const deadline = new Date(this.deadline);
-        if (now < deadline) return false;
-        return true;
+        return now >= deadline;
       },
     }),
   },
