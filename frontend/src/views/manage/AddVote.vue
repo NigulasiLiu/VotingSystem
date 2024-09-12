@@ -858,8 +858,8 @@ const columns = [
 }
 
 .highlighted-card {
-  background: linear-gradient(to right, rgba(144, 238, 144, 0.5), rgba(250, 250, 250, 0.5)); /* 从浅绿到半透明的渐变 */
-  border: 2px solid lightgreen; /* 绿色边框 */
+  background: linear-gradient(to right, rgba(22, 120, 255, 0.5), rgba(250, 250, 250, 0.5)); /* 从浅绿到半透明的渐变 rgba(144, 238, 144, 0.5)*/
+  border: 2px solid lightblue; /* 绿色边框 */
 }
 
 .ant-table {

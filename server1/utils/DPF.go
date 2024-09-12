@@ -180,7 +180,7 @@ func Tallying(voteid int, N int, eta int) []*big.Int {
 	}
 
 	// 调试输出累加后的 outs 数组
-	// fmt.Println("Tallying result:", outs)
+	//fmt.Println("Tallying result:", outs)
 	return outs
 }
 

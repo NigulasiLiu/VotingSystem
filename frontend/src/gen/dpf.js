@@ -14,7 +14,6 @@ function dpfGen(a, beta, eta, id) {
     let k0 = new Uint8Array(lambda);
     let k1 = new Uint8Array(lambda);
     const n = Math.ceil(Math.log2(eta));
-
     if (beta !== 0) {
       const alpha = share.toComplement(a, n);
       let s0 = share.generateRandomBitArray(lambda);
