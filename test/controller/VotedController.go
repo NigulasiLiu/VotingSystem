@@ -13,7 +13,7 @@ import (
 func AddVoted(ctx *gin.Context) {
 	// 获取参数
 	voteID, _ := strconv.Atoi(ctx.Params.ByName("voteid"))
-	voteKey, _ := strconv.Atoi(ctx.Params.ByName("votekey"))
+	voteKey := ctx.Params.ByName("votekey")
 
 	db := common.GetDB()
 	// 验证投票密钥是否存在
@@ -54,6 +54,9 @@ func AddVoted(ctx *gin.Context) {
 	var maxVoteIndex uint
 	db.Model(&model.Voted{}).Where("vote_id = ? AND vote_key = ?", voteID, voteKey).Select("max(vote_index)").Row().Scan(&maxVoteIndex)
 
+	//var count int64
+	//db.Model(&model.Voted{}).Where("vote_id = ? AND vote_key = ?", voteID, voteKey).Count(&count)
+	//var maxVoteIndex = uint(count)
 	// 新的 voteIndex
 	newVoteIndex := maxVoteIndex + 1
 
@@ -65,7 +68,7 @@ func AddVoted(ctx *gin.Context) {
 
 	// 记录该次投票：userid：voteid
 	newVoted := model.Voted{
-		VoteKey:   uint(voteKey),
+		VoteKey:   voteKey,
 		VoteID:    uint(voteID),
 		VoteIndex: newVoteIndex,
 	}

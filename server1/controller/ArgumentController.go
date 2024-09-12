@@ -48,7 +48,7 @@ func Compute(ctx *gin.Context) {
 
 	outs := utils.Tallying(voteID, int(N), int(eta))
 
-	outs = utils.Verify(voteID, int(N), outs)
+	//outs = utils.Verify(voteID, int(N), outs)
 
 	outsString := make([]string, len(outs))
 	for i, out := range outs {

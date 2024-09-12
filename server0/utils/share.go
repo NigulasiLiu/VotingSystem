@@ -97,17 +97,14 @@ func Convert(bitArray []byte) *big.Int {
 func toComplement(integer *big.Int, targetLength int) []byte {
 	// 获取整数的绝对值
 	absInteger := new(big.Int).Abs(integer)
-
 	// 转换为二进制字符串
 	binaryString := fmt.Sprintf("%b", absInteger)
-
 	// 确保字符串长度不超过目标长度
 	if len(binaryString) > targetLength {
 		binaryString = binaryString[len(binaryString)-targetLength:]
 	} else {
 		binaryString = strings.Repeat("0", targetLength-len(binaryString)) + binaryString
 	}
-
 	// 处理负数情况
 	if integer.Sign() < 0 {
 		// 计算反码

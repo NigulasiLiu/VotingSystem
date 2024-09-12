@@ -62,7 +62,7 @@ func Compute(ctx *gin.Context) {
 	outs := utils.Tallying(voteID, int(N), int(eta))
 
 	// 验证 outs
-	outs = utils.Verify(voteID, int(N), outs)
+	//outs = utils.Verify(voteID, int(N), outs)
 
 	// 将大整数转换为字符串
 	outsString := make([]string, len(outs))

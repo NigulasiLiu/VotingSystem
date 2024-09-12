@@ -96,7 +96,7 @@
           <div class="candidate-list-container">
             <a-divider></a-divider>
             <a-list
-              v-if="candidateData.list.length > 0"
+              v-if="candidateData.list && candidateData.list.length > 0"
               :grid="{ xs: 1, sm: 2, md: 2, lg: 3, xl: 3, xxl: 4 }"
               item-layout="vertical"
               size="middle"
@@ -339,39 +339,42 @@
           </a-table>
         </template>
         <!-- 第5步内容：分享 -->
-        <template v-if="currentStep === 4">
-          <div class="share-content-container">
-            <!-- 投票链接 -->
-            <a-card title="投票链接 (分享给投票人)" style="margin-bottom: 20px;">
-              <div class="voting-link-section">
+<!--        <template v-if="currentStep === 4">-->
+<!--          <div class="share-content-container">-->
+<!--            &lt;!&ndash; 投票链接 &ndash;&gt;-->
+<!--            <a-card title="投票链接 (分享给投票人)" style="margin-bottom: 20px;">-->
+<!--              <div class="voting-link-section">-->
 
-                <!-- 左侧虚拟URL链接行 -->
-                <div class="voting-link" style="display: block;"> <!-- 确保独占一行 -->
-                  <div class="link-item">
-                    <p style="font-weight: bold;">参与投票：“{{ vote.name }}”</p>
-                    <div class="link-wrapper">
-                      <a href="https://vote.example.com/m/12345/abcde" target="_blank" class="styled-link">
-                        https://vote.example.com/m/12345/abcde
-                      </a>
-                      <a-button type="link" @click="copyToClipboard('https://vote.example.com/m/12345/abcde')">复制</a-button>
-                    </div>
-                  </div>
-                </div>
+<!--                &lt;!&ndash; 左侧虚拟URL链接行 &ndash;&gt;-->
+<!--                <div class="voting-link" style="display: block;"> &lt;!&ndash; 确保独占一行 &ndash;&gt;-->
+<!--                  <div class="link-item">-->
+<!--                    <p style="font-weight: bold;">参与投票：“{{ vote.name }}”</p>-->
+<!--                    <div class="link-wrapper">-->
+<!--                      <a href="https://vote.example.com/m/12345/abcde" target="_blank" class="styled-link">-->
+<!--                        https://vote.example.com/m/12345/abcde-->
+<!--                      </a>-->
+<!--                      <a-button type="link" @click="copyToClipboard('https://vote.example.com/m/12345/abcde')">复制</a-button>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                </div>-->
 
-                <!-- 右侧微信二维码 -->
-                <div class="qrcode-section">
-                  <p style="font-weight: bold;">扫码微信投票</p>
-                  <img src="@/assets/qrcode.svg" alt="微信二维码" class="qrcode-img"/>
-                </div>
-              </div>
-            </a-card>
+<!--                &lt;!&ndash; 右侧微信二维码 &ndash;&gt;-->
+<!--                <div class="qrcode-section">-->
+<!--                  <p style="font-weight: bold;">扫码微信投票</p>-->
+<!--                  <img src="@/assets/qrcode.svg" alt="微信二维码" class="qrcode-img"/>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </a-card>-->
 
-          </div>
-        </template>
+<!--          </div>-->
+<!--        </template>-->
       </a-form>
 
       <!-- Navigation Buttons -->
       <div :style="{ marginTop: '24px' }">
+        <a-button v-if="currentStep == 0" @click="$router.replace({ name: 'votinglist' })">
+        取消
+        </a-button>
         <a-button v-if="currentStep > 0" @click="prev">
           上一步
         </a-button>
@@ -389,7 +392,6 @@
         >
           下一步
         </a-button>
-
         <!-- 完成按钮 -->
         <a-button v-if="currentStep === steps.length - 1" type="primary" @click="finishAndRedirect" style="margin-left: 8px">
           完成
@@ -435,7 +437,7 @@ const steps = [
   { title: '候选人' },
   { title: '投票者' },
   { title: '完成' },
-  { title: '分享' },
+  // { title: '分享' },
 ];
 
 const currentStep = ref(0);
@@ -535,13 +537,13 @@ const disabledDate = (current) => {
   return current && current < minSelectableTime;
 };
 
-const copyToClipboard = (text) => {
-  navigator.clipboard.writeText(text).then(() => {
-    message.success('链接已复制到剪贴板');
-  }).catch(() => {
-    message.error('复制失败，请手动复制');
-  });
-};
+// const copyToClipboard = (text) => {
+//   navigator.clipboard.writeText(text).then(() => {
+//     message.success('链接已复制到剪贴板');
+//   }).catch(() => {
+//     message.error('复制失败，请手动复制');
+//   });
+// };
 
 const toggleCandidateSelection = (id) => {
   const index = vote.candidateid.indexOf(id);

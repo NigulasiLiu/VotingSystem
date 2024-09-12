@@ -54,7 +54,6 @@ export default defineComponent({
           } else {
             message.error('投票失败');
           }
-          window.location.reload(); // 刷新页面
         })
         .catch((error) => {
           console.error('dpf.dpfGen 函数出现错误：', error);
@@ -66,7 +65,7 @@ export default defineComponent({
         .then(() => {
           this.visible = false;
           // 显示投票成功的消息
-          message.info('进入dpfGen');
+          // message.info('进入dpfGen');
           return this.doDpfGen();
         })
         .catch((err) => {

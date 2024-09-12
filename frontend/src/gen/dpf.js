@@ -58,12 +58,17 @@ function dpfGen(a, beta, eta, id) {
       k0 = share.concat(k0, share.toComplement(pos, 8));
       k1 = share.concat(k1, share.toComplement(pos, 8));
 
-      votedService.vote0({ id, k: k0 }).then((res0) => {
-        return votedService.vote1({ id, k: k1, nid: res0.data.data.id });
-      }).then(() => resolve(true)).catch((error) => {
-        console.error('Error during voting:', error);
-        resolve(false);
-      });
+      console.log('Sending vote0 with id:', id, 'and k0:', k0);
+      votedService.vote0({ id, k: k0 })
+        .then((res0) => {
+          console.log('Sending vote1 with id:', id, 'and k1:', k1, 'and nid:', res0.data.data.id);
+          return votedService.vote1({ id, k: k1, nid: res0.data.data.id });
+        })
+        .then(() => resolve(true))
+        .catch((error) => {
+          console.error('Error during voting:', error);
+          resolve(false);
+        });
     } else {
       // 使用 genRandom 生成随机键，如果beta为0
       k0 = genRandom(n);

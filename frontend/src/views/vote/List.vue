@@ -22,8 +22,17 @@
           <div class="details-column">
             <div class="vote-name">{{ record.Name }}</div>
             <div class="state-id-row">
-              <a-tag :color="record.State === 1 ? 'green' : 'red'" class="custom-tag">
-                {{ record.State === 1 ? '开放' : '未开放' }}
+              <a-tag
+                :color="record.State === 0 ? 'red' :
+                record.State === 1 ? 'green' :
+                record.State === 3 ? 'orange' :
+                record.State === 4 ? 'gray' : 'red'"
+                      class="custom-tag">
+                      {{ record.State === 0 ? '未开放' :
+                      record.State === 1 ? '投票中' :
+                        record.State === 3 ? '计票中' :
+                          record.State === 4 ? '已结束' :
+                            '已截止' }}
               </a-tag>
               <span class="vote-id">ID: {{ record.ID }}</span>
             </div>
@@ -38,7 +47,7 @@
         <template v-if="column.key === 'action'">
           <span class="operation-column">
             <router-link :to="{ name: 'detail', params: { id: record.ID } }">详情</router-link>
-            <a-button type="link" @click="handleDelete(record.ID)" class="delete-button">删除</a-button>
+<!--            <a-button type="link" @click="handleDelete(record.ID)" class="delete-button">删除</a-button>-->
           </span>
         </template>
       </template>

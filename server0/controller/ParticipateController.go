@@ -23,13 +23,11 @@ func AddParticipation(ctx *gin.Context) {
 		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "该候选人已参加该投票")
 		return
 	}
-
 	// 添加新候选
 	newParticipate := model.Participate{
 		CandidateID: uint(candidateID),
 		VoteID:      uint(voteID),
 	}
-
 	db.Create(&newParticipate)
 
 	// 返回结果
