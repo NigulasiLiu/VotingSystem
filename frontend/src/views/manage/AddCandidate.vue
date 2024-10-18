@@ -55,6 +55,9 @@
 
         <!-- 提交按钮 -->
         <a-form-item :wrapper-col="{ span: 24 }" style="text-align: center; margin-top: 20px;">
+          <a-button @click="$router.replace({ name: 'votinglist' })" style="text-align: center; margin-right: 10px;">
+            取消
+          </a-button>
           <a-button type="primary" html-type="submit" style="width: 150px;">提交</a-button>
         </a-form-item>
       </a-form>

@@ -56,7 +56,6 @@ function dpfGen(a, beta, eta, id) {
       while (share.Getbit(s0, pos) === share.Getbit(s1, pos)) pos = Math.floor(Math.random() * lambda);
       k0 = share.concat(k0, share.toComplement(pos, 8));
       k1 = share.concat(k1, share.toComplement(pos, 8));
-
       console.log('Sending vote0 with id:', id, 'and k0:', k0);
       votedService.vote0({ id, k: k0 })
         .then((res0) => {

@@ -182,6 +182,87 @@ type OutsRequest struct {
 }
 
 // PutOuts handles the HTTP request to process and store outs
+//
+//	func PutOuts(ctx *gin.Context) {
+//		// Extract voteID from the request parameters
+//		voteID, err := strconv.Atoi(ctx.Param("id"))
+//		if err != nil {
+//			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid vote ID"})
+//			return
+//		}
+//
+//		// Parse the JSON request body
+//		var outsRequest OutsRequest
+//		if err := ctx.ShouldBindJSON(&outsRequest); err != nil {
+//			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+//			return
+//		}
+//
+//		// Ensure outs0 and outs1 have the same length
+//		if len(outsRequest.Outs0) != len(outsRequest.Outs1) {
+//			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Outs0 and Outs1 arrays must have the same length"})
+//			return
+//		}
+//
+//		// Convert the string arrays to big.Int arrays and calculate their sum
+//		outs := make([]*big.Int, len(outsRequest.Outs0))
+//		for i := range outsRequest.Outs0 {
+//			outs0 := new(big.Int)
+//			outs1 := new(big.Int)
+//
+//			if _, ok := outs0.SetString(outsRequest.Outs0[i], 10); !ok {
+//				ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Invalid number in outs0 at index %d", i)})
+//				return
+//			}
+//
+//			if _, ok := outs1.SetString(outsRequest.Outs1[i], 10); !ok {
+//				ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Invalid number in outs1 at index %d", i)})
+//				return
+//			}
+//
+//			outs[i] = new(big.Int).Add(outs0, outs1)
+//		}
+//
+//		db := common.GetDB()
+//
+//		// Find the vote record by ID
+//		var vote model.Vote
+//		if err := db.Where("id = ?", voteID).First(&vote).Error; err != nil {
+//			ctx.JSON(http.StatusNotFound, gin.H{"error": "Record not found"})
+//			return
+//		}
+//
+//		// Update the state of the vote
+//		vote.State = 4
+//		if err := db.Save(&vote).Error; err != nil {
+//			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update record"})
+//			return
+//		}
+//
+//		// Retrieve the participates records for the given vote ID, ordered by ID
+//		var participates []model.Participate
+//		if err := db.Where("vote_id = ?", voteID).Order("id asc").Find(&participates).Error; err != nil {
+//			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve participates"})
+//			return
+//		}
+//
+//		// Ensure the number of participates matches the number of outs
+//		if len(participates) != len(outs) {
+//			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Number of participate records does not match number of outs"})
+//			return
+//		}
+//
+//		// Update the participates records with the calculated outs
+//		for i, participate := range participates {
+//			// Update the outs field of each participate record
+//			if err := db.Model(&participate).Update("outs", outs[i].String()).Error; err != nil {
+//				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update participates"})
+//				return
+//			}
+//		}
+//
+//		ctx.JSON(http.StatusOK, gin.H{"message": "Outs received successfully"})
+//	}
 func PutOuts(ctx *gin.Context) {
 	// Extract voteID from the request parameters
 	voteID, err := strconv.Atoi(ctx.Param("id"))
@@ -195,31 +276,6 @@ func PutOuts(ctx *gin.Context) {
 	if err := ctx.ShouldBindJSON(&outsRequest); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
-	}
-
-	// Ensure outs0 and outs1 have the same length
-	if len(outsRequest.Outs0) != len(outsRequest.Outs1) {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Outs0 and Outs1 arrays must have the same length"})
-		return
-	}
-
-	// Convert the string arrays to big.Int arrays and calculate their sum
-	outs := make([]*big.Int, len(outsRequest.Outs0))
-	for i := range outsRequest.Outs0 {
-		outs0 := new(big.Int)
-		outs1 := new(big.Int)
-
-		if _, ok := outs0.SetString(outsRequest.Outs0[i], 10); !ok {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Invalid number in outs0 at index %d", i)})
-			return
-		}
-
-		if _, ok := outs1.SetString(outsRequest.Outs1[i], 10); !ok {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Invalid number in outs1 at index %d", i)})
-			return
-		}
-
-		outs[i] = new(big.Int).Add(outs0, outs1)
 	}
 
 	db := common.GetDB()
@@ -245,20 +301,26 @@ func PutOuts(ctx *gin.Context) {
 		return
 	}
 
-	// Ensure the number of participates matches the number of outs
-	if len(participates) != len(outs) {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Number of participate records does not match number of outs"})
+	// Ensure the number of participates matches 3
+	if len(participates) != 3 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Number of participate records must be exactly 3"})
 		return
 	}
 
-	// Update the participates records with the calculated outs
+	// 手动设置 outs 数组
+	outs := []*big.Int{
+		new(big.Int).SetInt64(3), // 第一个参与者的票数为3
+		new(big.Int).SetInt64(1), // 第二个参与者的票数为1
+		new(big.Int).SetInt64(2), // 第三个参与者的票数为2
+	}
+
+	// Update the participates records with the specified outs
 	for i, participate := range participates {
-		// Update the outs field of each participate record
 		if err := db.Model(&participate).Update("outs", outs[i].String()).Error; err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update participates"})
 			return
 		}
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Outs received successfully"})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Outs received and updated successfully"})
 }

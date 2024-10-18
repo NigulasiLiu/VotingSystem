@@ -54,7 +54,6 @@ export default {
     async handleLogout() {
       try {
         await this.logout(); // 确保登出操作完成
-        message.success('已退出');
         this.$router.replace({ name: 'home' }); // 使用路由导航进行页面跳转
         setTimeout(() => {
           window.location.reload();

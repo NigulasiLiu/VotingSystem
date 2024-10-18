@@ -25,7 +25,7 @@ func EvalVote(ctx *gin.Context) {
 
 	fmt.Println("Received data:", k)
 
-	// 处理获取到的数据，这里简单打印出来
+	// ID是server0返回的argument id,这样可以计算同一位置的argument
 	utils.Eval(ID, voteID, k)
 
 }
